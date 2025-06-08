@@ -53,6 +53,7 @@ public class VistaSegunUsuario implements Serializable {
 			// Se le pasa su ID como responsable para futuras facturaciones
 			new ControladorCajero(vistaCajero, usuario.getId());
 
+			// Controlar que cuando se presione la tecla F12, se cambie el tema
 			vistaCajero.addKeyListener(new ControladorTema());
 			vistaCajero.setFocusable(true);
 		}
