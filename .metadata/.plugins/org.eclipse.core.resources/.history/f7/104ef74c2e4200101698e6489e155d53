@@ -1,0 +1,60 @@
+package vistaControlador;
+
+import java.io.Serializable;
+
+import controlador.ControladorCajero;
+import controlador.ControladorFactura;
+import controlador.ControladorProducto;
+import controlador.ControladorUsuario;
+import enumeraciones.Emergente;
+import modelo.Usuario;
+import util.Dialogos;
+import util.MiExcepcion;
+import vista.VistaAdministrador;
+import vista.VistaCajeros;
+
+/**
+ * Clase que lanza la vista correspondiente según el tipo de usuario que ha
+ * iniciado sesión. Se utiliza como punto de entrada tras un login exitoso.
+ */
+public class VistaSegunUsuario implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Constructor: identifica el tipo de usuario y lanza la vista adecuada.
+	 *
+	 * @param usuario Usuario autenticado
+	 * @throws MiExcepcion Si ocurre un error en la inicialización de controladores
+	 *                     o vistas
+	 */
+	public VistaSegunUsuario(Usuario usuario) throws MiExcepcion {
+		switch (usuario.getTipoUsuario()) {
+
+		// Si el usuario es administrador, se carga la vista de administración completa
+		case Administrador -> {
+			VistaAdministrador vistaAdministrador = new VistaAdministrador();
+
+			// Se asignan los controladores asociados a la vista del administrador
+			new ControladorUsuario(vistaAdministrador); // Gestión de usuarios
+			new ControladorProducto(vistaAdministrador); // Gestión de productos
+			new ControladorFactura(vistaAdministrador); // Visualización de facturas
+		}
+
+		// Si el usuario es cajero, se carga su vista limitada
+		case Cajero -> {
+			VistaCajeros vistaCajero = new VistaCajeros();
+
+			// Se le pasa su ID como responsable para futuras facturaciones
+			new ControladorCajero(vistaCajero, usuario.getId());
+
+		}
+
+		// Si el tipo de usuario no es reconocido
+		default -> {
+			Dialogos.avisoDialogo(Emergente.Error, "No se ha reconocido el tipo de usuario.");
+			System.exit(1); // Finaliza la aplicación
+		}
+		}
+	}
+}

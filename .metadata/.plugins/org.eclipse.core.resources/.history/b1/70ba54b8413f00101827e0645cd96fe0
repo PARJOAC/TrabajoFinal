@@ -1,0 +1,11 @@
+package util;
+
+import javax.swing.JOptionPane;
+
+public class ErrorDialogo {
+	
+	public ErrorDialogo() {
+		JOptionPane.showMessageDialog(null, "No se ha reconocido el tipo de usuario.", "Error",
+				JOptionPane.ERROR_MESSAGE);
+	}
+}

@@ -1,0 +1,48 @@
+package controlador;
+
+import bd.DAOFacturas;
+import bd.DAOFacturas.FacturaResumen;
+import vista.administrador.VistaAdministrador;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.sql.SQLException;
+import java.util.List;
+
+public class ControladorFactura {
+
+    private final VistaAdministrador vista;
+    private final DAOFacturas dao;
+
+    public ControladorFactura(VistaAdministrador vista) {
+        this.vista = vista;
+        this.dao = new DAOFacturas();
+        cargarFacturasEnTabla();
+    }
+
+    public void cargarFacturasEnTabla() {
+        try {
+            List<FacturaResumen> facturas = dao.listarFacturas();
+            DefaultTableModel modelo = vista.getModeloFacturas();
+            modelo.setRowCount(0);
+
+            for (FacturaResumen f : facturas) {
+                modelo.addRow(new Object[]{
+                        f.id,
+                        f.usuario,
+                        String.format("%.2f", f.total),
+                        String.format("%.2f", f.iva),
+                        String.format("%.2f", f.efectivo),
+                        String.format("%.2f", f.cambio),
+                        f.fecha
+                });
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(vista,
+                    "Error al cargar las facturas: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}

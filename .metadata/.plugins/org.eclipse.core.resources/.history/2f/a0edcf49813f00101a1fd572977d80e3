@@ -1,0 +1,16 @@
+package util;
+
+import javax.swing.JOptionPane;
+
+public class ErrorDialogo {
+	
+	public static void errorDialogo(String mensaje) {
+		JOptionPane.showMessageDialog(null, mensaje, "ERROR",
+				JOptionPane.ERROR_MESSAGE);
+	}
+	
+	public static void avisoDialogo(String mensaje) {
+		JOptionPane.showMessageDialog(null, mensaje, "AVISO",
+				JOptionPane.WARNING_MESSAGE);
+	}
+}

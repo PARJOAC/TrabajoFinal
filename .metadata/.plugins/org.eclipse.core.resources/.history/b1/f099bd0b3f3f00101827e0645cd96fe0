@@ -1,0 +1,38 @@
+package vista;
+
+import java.io.Serializable;
+import javax.swing.*;
+
+import controlador.ControladorCajero;
+import controlador.ControladorFactura;
+import controlador.ControladorProducto;
+import controlador.ControladorUsuario;
+import constructores.Usuario;
+import util.MiExcepcion;
+import vista.administrador.VistaAdministrador;
+import vista.cajero.VistaCajeros;
+
+public class VistaSegunUsuario implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	public VistaSegunUsuario(Usuario usuario) throws MiExcepcion {
+		switch (usuario.getTipoUsuario()) {
+			case Administrador:
+				VistaAdministrador vistaAdministrador = new VistaAdministrador();
+				new ControladorUsuario(vistaAdministrador);
+				new ControladorProducto(vistaAdministrador);
+				new ControladorFactura(vistaAdministrador);
+				break;
+
+			case Cajero:
+				VistaCajeros vistaCajero = new VistaCajeros();
+				new ControladorCajero(vistaCajero, usuario.getId());
+				break;
+
+			default:
+				JOptionPane.showMessageDialog(null, "No se ha reconocido el tipo de usuario.", "Error", JOptionPane.ERROR_MESSAGE);
+				System.exit(1);
+		}
+	}
+}

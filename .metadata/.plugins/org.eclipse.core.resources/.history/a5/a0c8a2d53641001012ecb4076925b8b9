@@ -1,0 +1,31 @@
+package test;
+
+import controlador.ControladorLogin;
+import enumeraciones.Temas;
+import util.EstiloVista;
+import util.MiExcepcion;
+import vista.VistaLogin;
+
+/**
+ * Clase principal que lanza la aplicación. Aplica el estilo visual y muestra la
+ * pantalla de login.
+ */
+public class Main {
+
+	/**
+	 * Método principal. Punto de entrada de la aplicación.
+	 *
+	 * @throws MiExcepcion si ocurre un error al iniciar el controlador
+	 */
+	@SuppressWarnings("unused")
+	public static void main(String[] args) throws MiExcepcion {
+		//Establecer el tema principal de la aplicación
+		EstiloVista estiloVista = new EstiloVista(Temas.Claro);
+		
+		// Crear la ventana de login
+		VistaLogin vistaInicial = new VistaLogin();
+
+		// Asocia el controlador a la vista de login
+		ControladorLogin controlador = new ControladorLogin(vistaInicial);
+	}
+}

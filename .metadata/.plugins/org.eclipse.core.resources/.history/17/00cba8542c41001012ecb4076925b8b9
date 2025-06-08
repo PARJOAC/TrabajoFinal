@@ -1,0 +1,47 @@
+package util;
+
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import com.formdev.flatlaf.FlatDarkLaf;
+// Importaciones de distintos temas FlatLaf
+import com.formdev.flatlaf.FlatLightLaf;
+
+import enumeraciones.Temas;
+
+/**
+ * Clase encargada de aplicar un estilo visual moderno a la interfaz Swing.
+ * Incluye varios temas de FlatLaf comentados para facilitar su uso.
+ */
+public class EstiloVista {
+
+	/**
+	 * La variable modo, por defecto, viene en un valor falso. Falso = Modo Claro /
+	 * Temas.Claro Verdadero = Modo Oscuro / Temas.Oscuro
+	 */
+	private static boolean modo = false;
+
+	/**
+	 * Aplica un tema visual (LookAndFeel) a la interfaz. Puedes cambiar el tema
+	 * descomentando el que quieras usar.
+	 */
+	public EstiloVista(Temas tema) {
+		modo = tema.equals(Temas.Claro) ? false : true;
+		cambiarTema();
+	}
+
+	private void cambiarTema() {
+		try {
+			if (modo)
+				UIManager.setLookAndFeel(new FlatDarkLaf());
+			else
+				UIManager.setLookAndFeel(new FlatLightLaf());
+			modo = !modo;
+		} catch (UnsupportedLookAndFeelException e) {
+			System.err.println("No se pudo aplicar el tema Claro de FlatLightLaf.");
+			e.printStackTrace();
+		}
+
+	}
+
+}

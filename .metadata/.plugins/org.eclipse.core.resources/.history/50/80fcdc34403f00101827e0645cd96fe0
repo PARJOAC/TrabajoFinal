@@ -1,0 +1,202 @@
+package constructores;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+
+import enumeraciones.Categoria;
+import enumeraciones.Marca;
+import util.LibreriaFechas;
+import util.MiExcepcion;
+
+/**
+ * Clase que representa un producto. Contiene toda la información relevante para su gestión.
+ */
+public class Producto implements Serializable {
+
+	// Necesario para serialización
+	private static final long serialVersionUID = 585044535912349700L;
+
+	// Atributos de instancia del producto
+	private String nombre, descripcion;
+	private double precio;
+	private String id; // Puede ser autogenerado por la BBDD o asignado
+	private Categoria categoria;
+	private Marca marca;
+	private int unidades;
+	private boolean enVenta;
+	private LocalDate fechaCaducidad;
+
+	// Valores por defecto
+	private static final String descripcionPorDefecto = "No se ha proporcionado una descripción.";
+	private static final Categoria categoriaPorDefecto = Categoria.SinCategoria;
+	private static final Marca marcaPorDefecto = Marca.SinMarca;
+	private static final boolean enVentaPorDefecto = true;
+
+	// ======================= CONSTRUCTORES =======================
+
+	/**
+	 * Constructor principal con todos los campos personalizables.
+	 */
+	public Producto(String nombreProducto, double precioProducto, String descripcionProducto,
+			Categoria categoriaProducto, Marca marcaProducto, int unidadesProducto, boolean enVenta,
+			String fechaCaducidad) throws MiExcepcion {
+		setNombre(nombreProducto);
+		setPrecio(precioProducto);
+		setDescripcion(descripcionProducto);
+		setCategoria(categoriaProducto);
+		setMarca(marcaProducto);
+		setUnidades(unidadesProducto);
+		setEnVenta(enVenta);
+		setFechaCaducidad(fechaCaducidad);
+	}
+
+	/**
+	 * Constructor con solo los campos obligatorios.
+	 */
+	public Producto(String nombreProducto, double precioProducto, int unidadesProducto, String fechaCaducidad)
+			throws MiExcepcion {
+		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaPorDefecto, marcaPorDefecto,
+				unidadesProducto, enVentaPorDefecto, fechaCaducidad);
+	}
+
+	/**
+	 * Constructor con obligatorios + categoría.
+	 */
+	public Producto(String nombreProducto, double precioProducto, Categoria categoriaProducto, int unidadesProducto,
+			String fechaCaducidad) throws MiExcepcion {
+		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaProducto, marcaPorDefecto,
+				unidadesProducto, enVentaPorDefecto, fechaCaducidad);
+	}
+
+	/**
+	 * Constructor con obligatorios + marca.
+	 */
+	public Producto(String nombreProducto, double precioProducto, Marca marcaProducto, int unidadesProducto,
+			String fechaCaducidad) throws MiExcepcion {
+		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaPorDefecto, marcaProducto,
+				unidadesProducto, enVentaPorDefecto, fechaCaducidad);
+	}
+
+	/**
+	 * Constructor con obligatorios + descripción.
+	 */
+	public Producto(String nombreProducto, double precioProducto, String descripcionProducto, int unidadesProducto,
+			String fechaCaducidad) throws MiExcepcion {
+		this(nombreProducto, precioProducto, descripcionProducto, categoriaPorDefecto, marcaPorDefecto,
+				unidadesProducto, enVentaPorDefecto, fechaCaducidad);
+	}
+
+	/**
+	 * Constructor con obligatorios + categoría + marca.
+	 */
+	public Producto(String nombreProducto, double precioProducto, Categoria categoriaProducto, Marca marcaProducto,
+			int unidadesProducto, String fechaCaducidad) throws MiExcepcion {
+		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaProducto, marcaProducto, unidadesProducto,
+				enVentaPorDefecto, fechaCaducidad);
+	}
+
+	/**
+	 * Constructor con obligatorios + categoría + descripción.
+	 */
+	public Producto(String nombreProducto, double precioProducto, String descripcionProducto,
+			Categoria categoriaProducto, int unidadesProducto, String fechaCaducidad) throws MiExcepcion {
+		this(nombreProducto, precioProducto, descripcionProducto, categoriaProducto, marcaPorDefecto, unidadesProducto,
+				enVentaPorDefecto, fechaCaducidad);
+	}
+
+	/**
+	 * Constructor con obligatorios + categoría + marca + enVenta.
+	 */
+	public Producto(String nombreProducto, double precioProducto, Categoria categoriaProducto, Marca marcaProducto,
+			int unidadesProducto, boolean enVenta, String fechaCaducidad) throws MiExcepcion {
+		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaProducto, marcaProducto, unidadesProducto,
+				enVenta, fechaCaducidad);
+	}
+
+	// ======================= GETTERS Y SETTERS =======================
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	public double getPrecio() {
+		return precio;
+	}
+
+	/**
+	 * Setter con validación de precio > 0.
+	 */
+	public void setPrecio(double precio) throws MiExcepcion {
+		if (precio <= 0)
+			throw new MiExcepcion("El precio debe ser mayor que 0.");
+		this.precio = precio;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
+	}
+
+	public Marca getMarca() {
+		return marca;
+	}
+
+	public void setMarca(Marca marca) {
+		this.marca = marca;
+	}
+
+	public int getUnidades() {
+		return unidades;
+	}
+
+	public void setUnidades(int unidades) {
+		this.unidades = unidades;
+	}
+
+	public boolean isEnVenta() {
+		return enVenta;
+	}
+
+	public void setEnVenta(boolean enVenta) {
+		this.enVenta = enVenta;
+	}
+
+	public LocalDate getFechaCaducidad() {
+		return fechaCaducidad;
+	}
+
+	/**
+	 * Setter de la fecha con validación utilizando LibreriaFechas.
+	 *
+	 * @param fechaCaducidad Fecha en formato String (yyyy-MM-dd)
+	 * @throws MiExcepcion Si la fecha no es válida
+	 */
+	public void setFechaCaducidad(String fechaCaducidad) throws MiExcepcion {
+		if (LibreriaFechas.convierteStringToLocalDate(fechaCaducidad) == null)
+			throw new MiExcepcion("La fecha es incorrecta.");
+		this.fechaCaducidad = LibreriaFechas.convierteStringToLocalDate(fechaCaducidad);
+	}
+}

@@ -1,0 +1,16 @@
+package util;
+
+import java.io.Serializable;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+
+import enumeraciones.Temas;
+
+public class BotonCambiarTema extends JButton implements Serializable{
+
+	private static final long serialVersionUID = -5612586807572350789L;
+	
+
+}

@@ -1,0 +1,58 @@
+package controlador;
+
+import util.Contrasena;
+import util.MiExcepcion;
+import vista.VistaSegunUsuario;
+import vista.login.VistaLogin;
+
+import javax.swing.*;
+
+import bd.DAOUsuarios;
+import constructores.Usuario;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class ControladorLogin implements ActionListener {
+	private final VistaLogin loginView;
+	private final DAOUsuarios dao;
+
+	public ControladorLogin(VistaLogin loginView) {
+		this.loginView = loginView;
+		this.dao = new DAOUsuarios();
+		this.loginView.getBotonLogin().addActionListener(this);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		try {
+			login();
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(loginView, "Error: " + ex.getMessage());
+		}
+	}
+
+	private void login() throws MiExcepcion {
+		String usuario = loginView.getCampoUsuario().getText().trim();
+		String pass = new String(loginView.getCampoContrasena().getPassword()).trim();
+
+		if (usuario.isEmpty() || pass.isEmpty()) {
+			JOptionPane.showMessageDialog(loginView, "Rellena todos los campos");
+			return;
+		}
+
+		Usuario u = dao.buscarUsuario(usuario);
+		if (u == null) {
+			JOptionPane.showMessageDialog(loginView, "Usuario no encontrado");
+			return;
+		}
+
+		if (!u.getPassword().equals(Contrasena.cifrar(pass))) {
+			JOptionPane.showMessageDialog(loginView, "Contraseña incorrecta");
+			return;
+		}
+
+		new VistaSegunUsuario(u.getTipoUsuario());
+		loginView.dispose();
+	}
+}

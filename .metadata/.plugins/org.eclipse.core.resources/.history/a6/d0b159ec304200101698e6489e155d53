@@ -1,0 +1,41 @@
+package util;
+
+import java.awt.Window;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
+import enumeraciones.Temas;
+
+public class EstiloVista {
+
+	private static Temas temaActual = Temas.Claro; // Valor inicial
+
+	public static void cambiarTema() {
+		try {
+			if (temaActual == Temas.Claro) {
+				UIManager.setLookAndFeel(new FlatDarkLaf());
+				temaActual = Temas.Oscuro;
+			} else if (temaActual == Temas.Oscuro) {
+				UIManager.setLookAndFeel(new FlatLightLaf());
+				temaActual = Temas.Claro;
+			} else {
+				// Si el tema actual es PorDefecto u otro, lo dejamos como Claro por defecto
+				UIManager.setLookAndFeel(new FlatLightLaf());
+				temaActual = Temas.Ninguno;
+			}
+
+			// Refresca todas las ventanas visibles
+			for (Window window : Window.getWindows()) {
+				SwingUtilities.updateComponentTreeUI(window);
+			}
+
+		} catch (UnsupportedLookAndFeelException e) {
+			System.err.println("No se pudo aplicar el tema.");
+			e.printStackTrace();
+		}
+	}
+}

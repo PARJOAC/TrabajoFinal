@@ -1,0 +1,89 @@
+package controlador;
+
+import util.Contrasena;
+import util.ErrorDialogo;
+import util.MiExcepcion;
+import vista.VistaLogin;
+import vista.VistaSegunUsuario;
+
+import javax.swing.*;
+
+import bd.DAOUsuarios;
+import modelo.Usuario;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+/**
+ * Controlador del proceso de login. Gestiona la autenticación del usuario y la
+ * redirección según su tipo.
+ */
+public class ControladorLogin implements ActionListener {
+
+	private final VistaLogin loginView; // Vista del formulario de inicio de sesión
+	private final DAOUsuarios dao; // Acceso a la base de datos de usuarios
+
+	/**
+	 * Constructor que enlaza la vista con este controlador. Se añade un
+	 * ActionListener al botón de login.
+	 *
+	 * @param loginView VistaLogin que contiene los campos de usuario y contraseña
+	 */
+	public ControladorLogin(VistaLogin loginView) {
+		this.loginView = loginView;
+		this.dao = new DAOUsuarios();
+		this.loginView.getBotonLogin().addActionListener(this); // Escucha el clic del botón
+	}
+
+	/**
+	 * Maneja los eventos del botón. Llama al método login() cuando se pulsa.
+	 *
+	 * @param e evento generado (clic en el botón)
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		try {
+			login();
+		} catch (Exception ex) {
+			// Muestra un mensaje de error si algo falla en el login
+			ErrorDialogo.errorDialogo("Error al iniciar sesión: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Lógica principal del inicio de sesión. Valida campos, comprueba credenciales
+	 * y abre la vista correspondiente si son correctas.
+	 *
+	 * @throws MiExcepcion si ocurre un error al consultar la base de datos
+	 */
+	private void login() throws MiExcepcion {
+		// Obtiene usuario y contraseña introducidos
+		String usuario = loginView.getCampoUsuario().getText().trim();
+		String pass = new String(loginView.getCampoContrasena().getPassword()).trim();
+
+		// Verifica que no estén vacíos
+		if (usuario.isEmpty() || pass.isEmpty()) {
+			JOptionPane.showMessageDialog(loginView, "Rellena todos los campos", "Aviso", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		// Busca el usuario en la base de datos
+		Usuario u = dao.buscarUsuario(usuario);
+		if (u == null) {
+			ErrorDialogo.errorDialogo("Usuario no encontrado.");
+			return;
+		}
+
+		// Verifica que la contraseña introducida coincida con la almacenada (cifrada)
+		if (!u.getPassword().equals(Contrasena.cifrar(pass))) {
+			JOptionPane.showMessageDialog(loginView, "Contraseña incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Si es correcto, se abre la vista correspondiente según el tipo de usuario
+		new VistaSegunUsuario(u);
+
+		// Se cierra la ventana de login
+		loginView.dispose();
+	}
+}

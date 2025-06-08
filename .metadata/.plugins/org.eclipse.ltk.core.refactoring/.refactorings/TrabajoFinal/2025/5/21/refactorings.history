@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;eventos.BotonesEventos&apos; to &apos;EventosLogin&apos;&#x0D;&#x0A;- Original project: &apos;TrabajoFinal&apos;&#x0D;&#x0A;- Original element: &apos;eventos.BotonesEventos&apos;&#x0D;&#x0A;- Renamed element: &apos;eventos.EventosLogin&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;BotonesEventos&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;eventos{BotonesEventos.java[BotonesEventos" matchStrategy="1" name="EventosLogin" qualified="false" references="true" similarDeclarations="false" stamp="1748216256086" textual="false" version="1.0"/>
+</session>

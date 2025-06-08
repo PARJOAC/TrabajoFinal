@@ -1,0 +1,46 @@
+package enumeraciones;
+
+/**
+ * Enumeración que define los tipos de temas del sistema. Cada tipo tiene un
+ * valor numérico.
+ */
+public enum Temas {
+
+	Claro(0),
+	Oscuro(1);
+
+	private final int valor; // Valor entero asociado al tipo de tema
+
+	/**
+	 * Constructor de la enumeración.
+	 *
+	 * @param valor       valor numérico del tipo de tema
+	 */
+	Temas(int valor) {
+		this.valor = valor;
+	}
+
+	/**
+	 * Obtiene el valor numérico asociado al tipo de tema.
+	 *
+	 * @return valor del tipo
+	 */
+	public int getValor() {
+		return valor;
+	}
+
+	/**
+	 * Devuelve el tipo de usuario correspondiente al valor proporcionado.
+	 *
+	 * @param valor valor numérico buscado
+	 * @return TipoUsuario correspondiente
+	 * @throws IllegalArgumentException si el valor no corresponde a ningún tipo
+	 */
+	public static TipoUsuario fromValor(int valor) {
+		for (TipoUsuario tipo : TipoUsuario.values()) {
+			if (tipo.getValor() == valor)
+				return tipo;
+		}
+		throw new IllegalArgumentException("TipoUsuario no válido: " + valor);
+	}
+}

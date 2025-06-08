@@ -1,0 +1,19 @@
+package util;
+
+import javax.swing.JOptionPane;
+
+import enumeraciones.Emergente;
+
+public class Dialogos {
+
+	public static void avisoDialogo(Emergente tipoAviso, String mensaje) {
+		int opcion;
+		switch(tipoAviso) {
+		case Advertencia -> opcion = JOptionPane.WARNING_MESSAGE;
+		case Error -> opcion = JOptionPane.ERROR_MESSAGE;
+		case Informacion -> opcion = JOptionPane.INFORMATION_MESSAGE;
+		}
+		JOptionPane.showMessageDialog(null, mensaje, tipoAviso.getDescripcionEmergente(), opcion);
+	}
+	
+}

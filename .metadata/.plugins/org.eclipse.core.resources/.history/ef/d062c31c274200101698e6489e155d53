@@ -1,0 +1,26 @@
+package modelo;
+
+public class Factura {
+	public int id;
+	public String usuario;
+	public double total;
+	public double iva;
+	public double efectivo;
+	public double cambio;
+	public String fecha;
+
+	/**
+	 * Constructor para inicializar el resumen de factura con todos sus datos.
+	 */
+	public Factura(int id, String usuario, double total, double iva, double efectivo, double cambio,
+			String fecha) {
+		this.id = id;
+		this.usuario = usuario;
+		this.total = total;
+		this.iva = iva;
+		this.efectivo = efectivo;
+		this.cambio = cambio;
+		this.fecha = fecha;
+	}
+
+}

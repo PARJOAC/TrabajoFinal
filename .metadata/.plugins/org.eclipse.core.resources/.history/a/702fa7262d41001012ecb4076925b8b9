@@ -1,0 +1,26 @@
+package util;
+
+import java.io.Serializable;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+
+import enumeraciones.Temas;
+
+public class BotonCambiarTema extends JButton implements Serializable{
+
+	private static final long serialVersionUID = -5612586807572350789L;
+	
+	public static void botonCambiarTema(JTabbedPane frame) {
+		// Aplica el estilo visual a toda la interfaz
+		EstiloVista estiloVista = new EstiloVista(Temas.Claro);
+		estiloVista.cambiarTema();
+		
+		JButton botonTema = new JButton();
+		botonTema.setText("Cambiar Tema");
+		
+		frame.add(botonTema);
+	}
+
+}

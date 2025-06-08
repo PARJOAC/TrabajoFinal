@@ -1,0 +1,138 @@
+package bd;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import util.MiExcepcion;
+
+/**
+ * Clase DAO que se encarga de gestionar la inserción de facturas y sus detalles,
+ * así como la consulta de los productos asociados a una factura específica.
+ */
+public class DAOCajeros {
+
+    /**
+     * Inserta una nueva factura en la tabla 'facturas' y devuelve el ID generado automáticamente.
+     *
+     * @param idUsuario    ID del usuario responsable de la operación
+     * @param total        Importe total de la factura
+     * @param iva          IVA aplicado sobre el total
+     * @param efectivo     Cantidad de dinero entregada por el cliente
+     * @param cambio       Dinero devuelto al cliente
+     * @return             ID de la factura recién creada
+     */
+    public int crearFactura(int idUsuario, double total, double iva, double efectivo, double cambio)
+            throws SQLException, ClassNotFoundException, MiExcepcion {
+
+        // Sentencia SQL para insertar una factura, con la fecha actual (NOW())
+        String sql = "INSERT INTO facturas (fecha, usuarioResponsable, total, iva, efectivo, cambio) VALUES (NOW(), ?, ?, ?, ?, ?)";
+
+        // Se crea una conexión y se prepara la sentencia SQL para obtener el ID generado
+        try (Connection conn = BDConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            // Se rellenan los valores de la sentencia preparada con los datos recibidos
+            stmt.setInt(1, idUsuario);
+            stmt.setDouble(2, total);
+            stmt.setDouble(3, iva);
+            stmt.setDouble(4, efectivo);
+            stmt.setDouble(5, cambio);
+
+            // Se ejecuta la inserción en la base de datos
+            stmt.executeUpdate();
+
+            // Se recupera el ID generado automáticamente por la base de datos (clave primaria autoincremental)
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // Devuelve el ID de la nueva factura
+                } else {
+                    // Si no se puede obtener el ID, se lanza una excepción
+                    throw new SQLException("No se pudo obtener el ID de la factura generada.");
+                }
+            }
+        }
+    }
+
+    /**
+     * Inserta un producto en la tabla 'detalles_factura', asociado a una factura existente.
+     *
+     * @param idFactura      ID de la factura a la que se añade el producto
+     * @param idProducto     ID del producto comprado
+     * @param nombreProducto Nombre del producto (puede ser redundante por motivos de histórico)
+     * @param precioUnitario Precio por unidad del producto
+     * @param cantidad       Cantidad de unidades compradas
+     * @param subtotal       Resultado de precioUnitario * cantidad
+     */
+    public void insertarDetalle(int idFactura, int idProducto, String nombreProducto, double precioUnitario,
+                                 int cantidad, double subtotal)
+            throws SQLException, ClassNotFoundException, MiExcepcion {
+
+        // Sentencia SQL para insertar el detalle de un producto en una factura
+        String sql = "INSERT INTO detalles_factura (idFactura, idProducto, nombreProducto, precioUnitario, cantidad, subtotal) VALUES (?, ?, ?, ?, ?, ?)";
+
+        // Se establece la conexión y se prepara la sentencia
+        try (Connection conn = BDConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Se pasan los valores a la sentencia SQL
+            stmt.setInt(1, idFactura);
+            stmt.setInt(2, idProducto);
+            stmt.setString(3, nombreProducto);
+            stmt.setDouble(4, precioUnitario);
+            stmt.setInt(5, cantidad);
+            stmt.setDouble(6, subtotal);
+
+            // Se ejecuta la sentencia
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Obtiene una lista de los productos comprados en una factura concreta, formateados como texto.
+     *
+     * @param idFactura ID de la factura de la cual se quiere consultar el detalle
+     * @return Lista de cadenas de texto que describen cada producto (nombre, precio, cantidad, subtotal)
+     */
+    public List<String> listarDetallesFactura(int idFactura)
+            throws SQLException, ClassNotFoundException, MiExcepcion {
+
+        // Lista donde se almacenará el resultado final
+        List<String> lista = new ArrayList<>();
+
+        // Sentencia SQL para obtener los detalles de la factura específica
+        String sql = "SELECT nombreProducto, precioUnitario, cantidad, subtotal FROM detalles_factura WHERE idFactura = ?";
+
+        // Se establece la conexión y se prepara la sentencia
+        try (Connection conn = BDConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Se asigna el ID de la factura al parámetro de la consulta
+            stmt.setInt(1, idFactura);
+
+            // Se ejecuta la consulta
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Se obtienen los datos de cada producto
+                    String nombre = rs.getString("nombreProducto");
+                    double precio = rs.getDouble("precioUnitario");
+                    int cantidad = rs.getInt("cantidad");
+                    double subtotal = rs.getDouble("subtotal");
+
+                    // Se redondean los valores a 2 decimales para evitar errores visuales o inconsistencias
+                    precio = Math.round(precio * 100.0) / 100.0;
+                    subtotal = Math.round(subtotal * 100.0) / 100.0;
+
+                    // Se genera una línea de texto con el formato deseado
+                    String detalle = nombre + " - " + precio + " x" + cantidad + " = " + subtotal;
+
+                    // Se añade el detalle a la lista
+                    lista.add(detalle);
+                }
+            }
+        }
+
+        // Se devuelve la lista completa de descripciones de productos
+        return lista;
+    }
+}

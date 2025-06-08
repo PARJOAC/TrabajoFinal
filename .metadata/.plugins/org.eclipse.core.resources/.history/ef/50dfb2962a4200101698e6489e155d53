@@ -1,0 +1,232 @@
+package controlador;
+
+import bd.DAOProductos;
+import enumeraciones.Categoria;
+import enumeraciones.Emergente;
+import enumeraciones.Marca;
+import modelo.Producto;
+import util.Dialogos;
+import util.MiExcepcion;
+import vista.VistaAdministrador;
+
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+/**
+ * Controlador que gestiona la lógica de productos en la vista del
+ * administrador. Permite agregar, modificar, eliminar y listar productos en una
+ * tabla.
+ */
+public class ControladorProducto implements ActionListener, ListSelectionListener {
+
+	private final VistaAdministrador vista; // Referencia a la vista del administrador
+	private final DAOProductos daoProductos; // Acceso a la base de datos de productos
+
+	/**
+	 * Constructor: vincula los botones de la vista con sus acciones
+	 * correspondientes.
+	 *
+	 * @param vista vista del administrador con componentes de gestión de productos
+	 */
+	public ControladorProducto(VistaAdministrador vista) {
+		this.vista = vista;
+		this.daoProductos = new DAOProductos();
+
+		// Asigna acciones a los botones de la interfaz
+		vista.getBotonAgregarProducto().addActionListener(this);
+		vista.getBotonModificarProducto().addActionListener(this);
+		vista.getBotonEliminarProducto().addActionListener(this);
+		vista.getTablaProductos().getSelectionModel().addListSelectionListener(this);
+
+		// Carga inicial de la tabla de productos
+		cargarTabla();
+	}
+
+	/**
+	 * Manejo de eventos según el botón presionado.
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object fuente = e.getSource();
+
+		if (fuente == vista.getBotonAgregarProducto())
+			agregarProducto();
+		else if (fuente == vista.getBotonModificarProducto())
+			modificarProducto();
+		else if (fuente == vista.getBotonEliminarProducto())
+			eliminarProducto();
+		else if (fuente == vista.getTablaProductos())
+			modificarProducto();
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		int fila = vista.getTablaProductos().getSelectedRow();
+		if (fila == -1)
+			return;
+
+		vista.getCampoNombreProducto().setText(vista.getModeloProductos().getValueAt(fila, 1).toString());
+		vista.getCampoPrecioProducto().setText(vista.getModeloProductos().getValueAt(fila, 2).toString());
+		vista.getCampoUnidadesProducto().setText(vista.getModeloProductos().getValueAt(fila, 3).toString());
+		vista.getCampoFechaProducto().setText(vista.getModeloProductos().getValueAt(fila, 4).toString());
+		vista.getCampoDescripcionProducto().setText(""); // Descripción no visible en la tabla
+
+		// Categoría
+		String categoria = vista.getModeloProductos().getValueAt(fila, 5).toString();
+		for (int i = 0; i < vista.getComboCategoriaProducto().getItemCount(); i++) {
+			if (vista.getComboCategoriaProducto().getItemAt(i).getDescripcionCategoria().equals(categoria)) {
+				vista.getComboCategoriaProducto().setSelectedIndex(i);
+				break;
+			}
+		}
+
+		// Marca
+		String marca = vista.getModeloProductos().getValueAt(fila, 6).toString();
+		for (int i = 0; i < vista.getComboMarcaProducto().getItemCount(); i++) {
+			if (vista.getComboMarcaProducto().getItemAt(i).getNombreMarca().equals(marca)) {
+				vista.getComboMarcaProducto().setSelectedIndex(i);
+				break;
+			}
+		}
+
+		// En venta
+		String estado = vista.getModeloProductos().getValueAt(fila, 7).toString();
+		vista.getCheckEnVenta().setSelected(estado.equalsIgnoreCase("Disponible"));
+	}
+
+	/**
+	 * Agrega un nuevo producto a la base de datos y actualiza la tabla.
+	 */
+	private void agregarProducto() {
+		try {
+			Producto producto = construirProductoDesdeFormulario();
+			daoProductos.crearProducto(producto); // Inserta en la BBDD
+			cargarTabla(); // Refresca la tabla
+			limpiarFormulario(); // Limpia los campos del formulario
+		} catch (MiExcepcion ex) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al añadir un producto: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Modifica el producto seleccionado en la tabla con los datos del formulario.
+	 */
+	private void modificarProducto() {
+		int fila = vista.getTablaProductos().getSelectedRow();
+		if (fila == -1) {
+			Dialogos.avisoDialogo(Emergente.Error, "Selecciona un producto de la tabla para modificar.");
+			return;
+		}
+
+		// Obtiene el ID del producto desde la fila seleccionada
+		String id = vista.getModeloProductos().getValueAt(fila, 0).toString();
+
+		try {
+			Producto producto = construirProductoDesdeFormulario();
+			if(producto == null) return;
+			producto.setId(id); // Asegura que se modifica el producto correcto
+			daoProductos.modificarProducto(producto);
+			cargarTabla();
+			limpiarFormulario();
+		} catch (MiExcepcion ex) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al modificar un producto: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Elimina el producto seleccionado de la base de datos y actualiza la tabla.
+	 */
+	private void eliminarProducto() {
+		int fila = vista.getTablaProductos().getSelectedRow();
+		if (fila == -1) {
+			Dialogos.avisoDialogo(Emergente.Error, "Selecciona un producto de la tabla para eliminar.");
+			return;
+		}
+
+		String id = vista.getModeloProductos().getValueAt(fila, 0).toString();
+
+		try {
+			daoProductos.eliminarProducto(id);
+			cargarTabla();
+			limpiarFormulario();
+		} catch (MiExcepcion ex) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al eliminar un producto: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Carga todos los productos desde la base de datos y los muestra en la tabla.
+	 */
+	private void cargarTabla() {
+		try {
+			DefaultTableModel modelo = vista.getModeloProductos();
+			modelo.setRowCount(0); // Limpia la tabla antes de cargar datos
+			List<Producto> productos = daoProductos.listarProductos();
+
+			// Añade cada producto como una fila nueva
+			productos.stream()
+					.forEach(p -> modelo.addRow(new Object[] { p.getId(), p.getNombre(), p.getPrecio(), p.getUnidades(),
+							p.getFechaCaducidad(), p.getCategoria().getDescripcionCategoria(),
+							p.getMarca().getNombreMarca(), p.isEnVenta() ? "Disponible" : "No disponible" }));
+
+		} catch (MiExcepcion ex) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al cargar la tabla: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Construye un objeto Producto a partir de los datos introducidos en el
+	 * formulario.
+	 *
+	 * @return Producto construido con los datos actuales de la vista
+	 * @throws MiExcepcion si algún campo no es válido
+	 */
+	private Producto construirProductoDesdeFormulario() throws MiExcepcion {
+
+		// Recupera todos los campos del formulario
+		String nombre = vista.getCampoNombreProducto().getText().trim();
+		String precioStr = vista.getCampoPrecioProducto().getText().trim();
+		String unidadesStr = vista.getCampoUnidadesProducto().getText().trim();
+		String fecha = vista.getCampoFechaProducto().getText().trim();
+		String descripcion = vista.getCampoDescripcionProducto().getText().trim();
+		Categoria categoria = (Categoria) vista.getComboCategoriaProducto().getSelectedItem();
+		Marca marca = (Marca) vista.getComboMarcaProducto().getSelectedItem();
+		boolean enVenta = vista.getCheckEnVenta().isSelected();
+
+		double precio;
+		int unidades;
+
+		try {
+			precio = Double.parseDouble(precioStr);
+			unidades = Integer.parseInt(unidadesStr);
+		} catch (NumberFormatException e) {
+			Dialogos.avisoDialogo(Emergente.Error, "Has escrito datos inválidos.");
+			return null;
+		}
+
+		// Devuelve el nuevo producto
+		return new Producto(nombre, precio, descripcion, categoria, marca, unidades, enVenta, fecha);
+	}
+
+
+
+	/**
+	 * Limpia todos los campos del formulario de productos.
+	 */
+	private void limpiarFormulario() {
+		vista.getCampoNombreProducto().setText("");
+		vista.getCampoPrecioProducto().setText("");
+		vista.getCampoUnidadesProducto().setText("");
+		vista.getCampoFechaProducto().setText("");
+		vista.getCampoDescripcionProducto().setText("");
+		vista.getComboCategoriaProducto().setSelectedIndex(0);
+		vista.getComboMarcaProducto().setSelectedIndex(0);
+		vista.getCheckEnVenta().setSelected(true);
+	}
+
+}

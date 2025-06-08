@@ -1,0 +1,19 @@
+package util;
+
+import java.awt.Image;
+import java.net.URL;
+
+import javax.swing.ImageIcon;
+
+public class Logotipo extends JFrame{
+
+	public static Image logotipoCabecera() {
+		
+		URL ruta = getClass().getResource("/logos/logoCabecera.png");
+		Image imagenEscalada = null;
+		if (ruta != null) {
+			ImageIcon icono = new ImageIcon(ruta);
+			imagenEscalada = icono.getImage();
+		}
+	}
+}

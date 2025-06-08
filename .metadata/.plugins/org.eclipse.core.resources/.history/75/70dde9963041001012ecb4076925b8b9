@@ -1,0 +1,94 @@
+package vista;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.Serializable;
+import java.net.URL;
+
+/**
+ * Vista gráfica para el inicio de sesión de usuarios. Muestra un formulario con
+ * campos de usuario y contraseña, y un botón de acceso.
+ */
+public class VistaLogin extends JFrame implements Serializable {
+
+	private static final long serialVersionUID = -1584848902050255112L;
+
+	private JTextField campoUsuario; // Campo para introducir el nombre de usuario
+	private JPasswordField campoContrasena; // Campo para introducir la contraseña
+	private JButton botonLogin; // Botón para iniciar sesión
+
+	/**
+	 * Constructor: configura e inicializa la interfaz del login.
+	 */
+	public VistaLogin() {
+		setTitle("Inicio de sesión");
+		setSize(500, 250);
+		setLocationRelativeTo(null); // Centrar en pantalla
+		setResizable(false); // Tamaño fijo
+
+		// Inicialización de campos
+		campoUsuario = new JTextField(16);
+		campoContrasena = new JPasswordField(16);
+		botonLogin = new JButton("Iniciar sesión");
+
+		// Panel principal con BorderLayout
+		JPanel principal = new JPanel(new BorderLayout());
+
+		// Panel central que contiene campos e imagen
+		JPanel centro = new JPanel(new BorderLayout());
+
+		// Panel de campos
+		JPanel panelCampos = new JPanel(new GridLayout(4, 1, 5, 5));
+		panelCampos.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 10));
+		panelCampos.add(new JLabel("Usuario:"));
+		panelCampos.add(campoUsuario);
+		panelCampos.add(new JLabel("Contraseña:"));
+		panelCampos.add(campoContrasena);
+
+		// Imagen a la derecha
+		JLabel etiquetaImagen = new JLabel();
+		URL ruta = getClass().getResource("img/logo.png");
+		System.out.println(ruta.toString());
+		if (ruta != null) {
+			ImageIcon icono = new ImageIcon(ruta);
+			Image imagenEscalada = icono.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+			etiquetaImagen.setIcon(new ImageIcon(imagenEscalada));
+		}
+		JPanel panelImagen = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		panelImagen.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 20));
+		panelImagen.add(etiquetaImagen);
+
+		// Añadir los subpaneles al panel central
+		centro.add(panelCampos, BorderLayout.CENTER);
+		centro.add(panelImagen, BorderLayout.EAST);
+
+		// Botón inferior
+		JPanel botones = new JPanel();
+		botones.add(botonLogin);
+
+		// Añadir todo al contenedor principal
+		principal.add(centro, BorderLayout.CENTER);
+		principal.add(botones, BorderLayout.SOUTH);
+
+		// Añadir al JDialog
+		add(principal);
+
+		// Configuración final
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setVisible(true);
+	}
+
+	// Getters
+
+	public JTextField getCampoUsuario() {
+		return campoUsuario;
+	}
+
+	public JPasswordField getCampoContrasena() {
+		return campoContrasena;
+	}
+
+	public JButton getBotonLogin() {
+		return botonLogin;
+	}
+}

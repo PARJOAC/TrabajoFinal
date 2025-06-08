@@ -1,0 +1,44 @@
+package enumeraciones;
+
+/**
+ * Enumeración que define los tipos de errores del sistema. Cada tipo tiene una descripción legible.
+ */
+public enum Especial {
+
+	Error("Error"), Advertencia("Advertencia");
+
+	private final String descripcion; // Descripción legible para mostrar en la interfaz
+
+	/**
+	 * Constructor de la enumeración.
+	 *
+	 * @param descripcion descripción legible del tipo
+	 */
+	Especial(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	/**
+	 * Obtiene la descripción legible del tipo de error.
+	 *
+	 * @return descripción del tipo
+	 */
+	public String getDescripcionError() {
+		return descripcion;
+	}
+
+	/**
+	 * Devuelve el tipo de usuario correspondiente al valor proporcionado.
+	 *
+	 * @param valor valor numérico buscado
+	 * @return TipoUsuario correspondiente
+	 * @throws IllegalArgumentException si el valor no corresponde a ningún tipo
+	 */
+	public static Emergente fromValor(int valor) {
+		for (Emergente tipo : Emergente.values()) {
+			if (tipo.getValor() == valor)
+				return tipo;
+		}
+		throw new IllegalArgumentException("TipoUsuario no válido: " + valor);
+	}
+}

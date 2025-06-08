@@ -1,0 +1,38 @@
+package util;
+
+import java.awt.Image;
+import java.net.URL;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+
+public class Logotipo {
+
+	public static Image logotipoCabecera(JFrame frame) {
+
+		URL ruta = frame.getClass().getResource("/logos/logoCabecera.png");
+		Image imagenEscalada = null;
+
+		System.out.println(RUTA);
+		if (ruta != null) {
+			ImageIcon icono = new ImageIcon(ruta);
+			imagenEscalada = icono.getImage();
+		}
+
+		return imagenEscalada;
+	}
+
+	public static Image logotipoMediano(JFrame frame) {
+
+		URL ruta = frame.getClass().getResource("/logos/logoCabecera.png");
+		Image imagenEscalada = null;
+
+		if (ruta != null) {
+			ImageIcon icono = new ImageIcon(ruta);
+			imagenEscalada = icono.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+		}
+		ImageIcon icono = new ImageIcon(ruta);
+
+		return imagenEscalada;
+	}
+}

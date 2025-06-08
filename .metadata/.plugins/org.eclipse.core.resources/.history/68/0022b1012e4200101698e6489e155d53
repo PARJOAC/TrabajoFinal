@@ -1,0 +1,33 @@
+package controlador;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import util.EstiloVista;
+
+public class ControladorTema implements KeyListener{
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		if(e.isActionKey() && e.getKeyCode() == KeyEvent.VK_F10) {
+			System.out.println("F10");
+			EstiloVista.cambiarTema();
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.isActionKey() && e.getKeyCode() == KeyEvent.VK_F10) {
+			System.out.println("F10");
+			EstiloVista.cambiarTema();
+		}
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

@@ -1,0 +1,27 @@
+1748218180397	Move compilation unit
+1748218193762	Rename package 'vistacajero'
+1748218198000	Rename package 'vistaAdministrador'
+1748218204207	Copy package
+1748218207857	Delete element
+1748218222556	Move compilation unit
+1748218231008	Rename package 'vista.administrador'
+1748218264305	Move compilation unit
+1748218280867	Move compilation unit
+1748218359123	Delete element
+1748218427806	Move compilation unit
+1748258500395	Delete element
+1748349102279	Move compilation unit
+1748349174908	Rename package 'eventos'
+1748349277202	Delete element
+1748371062035	Delete element
+1748427788883	Move compilation unit
+1748428019636	Rename type 'LoginView'
+1748428099215	Delete element
+1748428228532	Rename type 'LoginController'
+1748428236410	Rename type 'CajeroController'
+1748428244484	Rename type 'ProductoController'
+1748428250743	Rename type 'UsuarioController'
+1748428276498	Rename type 'AppController'
+1748428283658	Move compilation unit
+1748428348314	Rename type 'Login'
+1748428366929	Rename type 'MenuPrincipalView'

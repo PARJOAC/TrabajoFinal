@@ -1,0 +1,17 @@
+package vista;
+
+import controlador.ControladorLogin;
+import util.EstiloVista;
+import util.MiExcepcion;
+import vista.login.VistaLogin;
+
+public class Main {
+    @SuppressWarnings("unused")
+	public static void main(String[] args) throws MiExcepcion {
+    	//EstiloVista estiloVista = new EstiloVista();
+    	VistaLogin vistaInicial = new VistaLogin();
+    	
+    	ControladorLogin controlador = new ControladorLogin(vistaInicial);
+    }
+}
+

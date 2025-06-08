@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="javax.swing.UIManager"/>
+    <fullyQualifiedTypeName name="com.formdev.flatlaf.IntelliJTheme.ThemeLaf"/>
+    <fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
+    <fullyQualifiedTypeName name="util.Contrasena"/>
+    <fullyQualifiedTypeName name="com.formdev.flatlaf.IntelliJTheme"/>
+    <fullyQualifiedTypeName name="java.io.InputStream"/>
+    <fullyQualifiedTypeName name="com.formdev.flatlaf.ui.FlatSliderUI"/>
+    <fullyQualifiedTypeName name="com.formdev.flatlaf.FlatIntelliJLaf"/>
+    <fullyQualifiedTypeName name="com.formdev.flatlaf.themes.FlatMacLightLaf"/>
+    <fullyQualifiedTypeName name="util.ErrorDialogo"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="util.BotonCambiarTema"/>
+    <fullyQualifiedTypeName name="java.awt.BorderLayout"/>
+    <fullyQualifiedTypeName name="enumeraciones.TipoUsuario"/>
+    <fullyQualifiedTypeName name="enumeraciones.Temas"/>
+    <fullyQualifiedTypeName name="javax.swing.JLabel"/>
+    <fullyQualifiedTypeName name="util.Logotipo"/>
+    <fullyQualifiedTypeName name="java.lang.String"/>
+    <fullyQualifiedTypeName name="java.lang.Math"/>
+    <fullyQualifiedTypeName name="util.EstiloVista"/>
+    <fullyQualifiedTypeName name="com.formdev.flatlaf.FlatDarculaLaf"/>
+    <fullyQualifiedTypeName name="java.awt.FlowLayout"/>
+</qualifiedTypeNameHistroy>
