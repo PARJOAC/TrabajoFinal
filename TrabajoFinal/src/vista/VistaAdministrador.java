@@ -296,7 +296,7 @@ public class VistaAdministrador extends JFrame implements Serializable {
 	public JTable getTablaFacturas() {return tablaFacturas;}
 	public DefaultTableModel getModeloFacturas() {return modeloFacturas;}
 	
-	public void controlAdministrador(ControladorAdministrador ctr) {
+	public void controlAdministrador(ControladorAdministrador ctr, ControladorTema ctrTema) {
 		// Controlador de Administrador
 		botonCrear.addActionListener(ctr);
 		botonBuscar.addActionListener(ctr);
@@ -309,12 +309,8 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		botonModificarProducto.addActionListener(ctr);
 		botonEliminarProducto.addActionListener(ctr);
 		tablaProductos.getSelectionModel().addListSelectionListener(ctr);
-	}
-
-	public void controlTeclas(ControladorTema ctr) {
-		//Teclas
-		// Controlar que cuando se presione la tecla F12, se cambie el tema
-		addKeyListener(ctr);
+		
+		addKeyListener(ctrTema);
 		setFocusable(true);
 	}
 	

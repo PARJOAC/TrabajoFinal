@@ -1,7 +1,7 @@
 package util;
 
 import java.awt.Image;
-import java.net.URL;
+import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -18,13 +18,12 @@ public class Logotipo {
 	public static Image logotipoCabecera(JFrame frame) {
 
 		// Busca el recurso (imagen) en la ruta indicada dentro del classpath
-		URL ruta = frame.getClass().getResource("/logos/logoCabecera.png");
+		File archivo = new File("img/logoCabecera.png");
 		Image imagenEscalada = null;
 
 		// Si encontró la ruta, crea un ImageIcon y obtiene la imagen
-		if (ruta != null) {
-			ImageIcon icono = new ImageIcon(ruta);
-			imagenEscalada = icono.getImage(); // Devuelve la imagen sin escalar
+		if (archivo.exists()) {
+			imagenEscalada = new ImageIcon(archivo.getAbsolutePath()).getImage();
 		}
 
 		// Devuelve la imagen o null si no se encontró
@@ -40,15 +39,12 @@ public class Logotipo {
 	 */
 	public static Image logotipoMediano(JFrame frame) {
 
-		// Obtiene el recurso desde el mismo path
-		URL ruta = frame.getClass().getResource("/logos/logoCabecera.png");
+		File archivo = new File("img/logoInicial.png");
 		Image imagenEscalada = null;
 
-		// Si existe la ruta, obtiene y escala la imagen
-		if (ruta != null) {
-			ImageIcon icono = new ImageIcon(ruta);
-			// Escalar a 150x150 píxeles
-			imagenEscalada = icono.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+		// Si encontró la ruta, crea un ImageIcon y obtiene la imagen
+		if (archivo.exists()) {
+			imagenEscalada = new ImageIcon(archivo.getAbsolutePath()).getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
 		}
 
 		// Devuelve la imagen escalada o null si no fue encontrada

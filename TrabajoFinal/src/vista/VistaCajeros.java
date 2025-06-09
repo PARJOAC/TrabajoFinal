@@ -18,137 +18,137 @@ public class VistaCajeros extends JFrame implements Serializable {
 
 	private static final long serialVersionUID = 2352856676015466747L;
 
-	// Contenedor de pestañas (actualmente solo una: "Caja")
 	private final JTabbedPane pestanas;
+	private JTable tablaProductos;
+	private DefaultTableModel modeloTabla;
+	private JTable tablaCarrito;
+	private DefaultTableModel modeloCarrito;
+	private JTextField campoDineroCliente;
+	private JLabel etiquetaTotal;
+	private JLabel etiquetaCambio;
+	private JButton botonAñadir;
+	private JButton botonEliminar;
+	private JButton botonFinalizar;
 
-	// Tabla de productos disponibles
-	private final JTable tablaProductos;
-	private final DefaultTableModel modeloTabla;
-
-	// Tabla del carrito de compras
-	private final JTable tablaCarrito;
-	private final DefaultTableModel modeloCarrito;
-
-	// Campos de texto y etiquetas para totales
-	private final JTextField campoDineroCliente;
-	private final JLabel etiquetaTotal;
-	private final JLabel etiquetaCambio;
-
-	// Botones de acción
-	private final JButton botonAñadir;
-	private final JButton botonEliminar;
-	private final JButton botonFinalizar;
-
-	/**
-	 * Constructor: inicializa todos los componentes gráficos de la vista.
-	 */
-	@SuppressWarnings("serial")
 	public VistaCajeros() {
 		super("Panel de Cajero");
-		//Añadir el logo a la cabecera de la pestaña
-		Image imagen= Logotipo.logotipoCabecera(this);
-		if(imagen != null) setIconImage(imagen);
-		
+		setIconoVentana();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(1500, 900));
-		setLocationRelativeTo(null); // Centrado
+		setLocationRelativeTo(null);
 
 		pestanas = new JTabbedPane();
 		JPanel panelCaja = new JPanel(new BorderLayout(10, 10));
 
-		// Tabla de productos
-		String[] columnasProductos = { "Nombre", "Precio", "Disponibles" };
-		modeloTabla = new DefaultTableModel() {
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false; // La tabla no es editable
-			}
-		};
-		
-		modeloTabla.setColumnIdentifiers(columnasProductos);
+		JPanel panelCentro = crearPanelCentro();
+		JPanel zonaInferior = crearZonaInferior();
 
-		tablaProductos = new JTable(modeloTabla);
-		JScrollPane scrollProductos = new JScrollPane(tablaProductos);
-		scrollProductos.setBorder(BorderFactory.createTitledBorder("Productos disponibles"));
-
-		// Tabla del carrito
-		String[] columnasCarrito = { "Nombre", "Precio", "Cantidad", "Subtotal" };
-		modeloCarrito = new DefaultTableModel() {
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false; // No se puede editar
-			}
-		};
-		modeloCarrito.setColumnIdentifiers(columnasCarrito);
-		
-		tablaCarrito = new JTable(modeloCarrito);
-		JScrollPane scrollCarrito = new JScrollPane(tablaCarrito);
-		scrollCarrito.setBorder(BorderFactory.createTitledBorder("Carrito de compra"));
-
-		// Panel central con ambas tablas
-		JPanel panelCentro = new JPanel(new GridLayout(1, 2, 10, 10));
-		panelCentro.add(scrollProductos);
-		panelCentro.add(scrollCarrito);
-
-		// Panel inferior (totales + efectivo)
-		etiquetaTotal = new JLabel("Total: 0.00 €");
-		etiquetaCambio = new JLabel("Cambio: 0.00 €");
-		campoDineroCliente = new JTextField();
-
-		JPanel panelInferior = new JPanel(new GridLayout(3, 2, 10, 10));
-		panelInferior.add(etiquetaTotal);
-		panelInferior.add(new JLabel("Efectivo entregado:"));
-		panelInferior.add(campoDineroCliente);
-		panelInferior.add(etiquetaCambio);
-		panelInferior.add(new JLabel(""));
-
-		// Botones de acción
-		botonAñadir = new JButton("Añadir");
-		botonEliminar = new JButton("Eliminar");
-		botonFinalizar = new JButton("Finalizar");
-
-		JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		panelBotones.add(botonAñadir);
-		panelBotones.add(botonEliminar);
-		panelBotones.add(botonFinalizar);
-
-		// Zona inferior combinada
-		JPanel zonaInferior = new JPanel(new BorderLayout());
-		zonaInferior.add(panelInferior, BorderLayout.CENTER);
-		zonaInferior.add(panelBotones, BorderLayout.SOUTH);
-
-		// Estructura general
 		panelCaja.add(panelCentro, BorderLayout.CENTER);
 		panelCaja.add(zonaInferior, BorderLayout.SOUTH);
 		pestanas.addTab("Caja", panelCaja);
 
 		add(pestanas);
-		setVisible(true);
+	}
+
+	private void setIconoVentana() {
+		Image imagen = Logotipo.logotipoCabecera(this);
+		if (imagen != null) {
+			setIconImage(imagen);
+		}
+	}
+
+	private JPanel crearPanelCentro() {
+		JPanel panelCentro = new JPanel(new GridLayout(1, 2, 10, 10));
+		panelCentro.add(crearTablaProductos());
+		panelCentro.add(crearTablaCarrito());
+		return panelCentro;
+	}
+
+	@SuppressWarnings("serial")
+	private JScrollPane crearTablaProductos() {
+		String[] columnasProductos = { "Nombre", "Precio", "Disponibles" };
+		modeloTabla = new DefaultTableModel() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+		modeloTabla.setColumnIdentifiers(columnasProductos);
+		tablaProductos = new JTable(modeloTabla);
+		JScrollPane scroll = new JScrollPane(tablaProductos);
+		scroll.setBorder(BorderFactory.createTitledBorder("Productos disponibles"));
+		return scroll;
+	}
+
+	@SuppressWarnings("serial")
+	private JScrollPane crearTablaCarrito() {
+		String[] columnasCarrito = { "Nombre", "Precio", "Cantidad", "Subtotal" };
+		modeloCarrito = new DefaultTableModel() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+		modeloCarrito.setColumnIdentifiers(columnasCarrito);
+		tablaCarrito = new JTable(modeloCarrito);
+		JScrollPane scroll = new JScrollPane(tablaCarrito);
+		scroll.setBorder(BorderFactory.createTitledBorder("Carrito de compra"));
+		return scroll;
+	}
+
+	private JPanel crearZonaInferior() {
+		JPanel zonaInferior = new JPanel(new BorderLayout());
+		zonaInferior.add(crearPanelTotales(), BorderLayout.CENTER);
+		zonaInferior.add(crearPanelBotones(), BorderLayout.SOUTH);
+		return zonaInferior;
+	}
+
+	private JPanel crearPanelTotales() {
+		etiquetaTotal = new JLabel("Total: 0.00 €");
+		etiquetaCambio = new JLabel("Cambio: 0.00 €");
+		campoDineroCliente = new JTextField();
+
+		JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+		panel.add(etiquetaTotal);
+		panel.add(new JLabel("Efectivo entregado:"));
+		panel.add(campoDineroCliente);
+		panel.add(etiquetaCambio);
+		panel.add(new JLabel()); // espacio vacío
+		panel.add(new JLabel()); // espacio vacío
+		return panel;
+	}
+
+	private JPanel crearPanelBotones() {
+		botonAñadir = new JButton("Añadir");
+		botonEliminar = new JButton("Eliminar");
+		botonFinalizar = new JButton("Finalizar");
+
+		JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		panel.add(botonAñadir);
+		panel.add(botonEliminar);
+		panel.add(botonFinalizar);
+		return panel;
 	}
 
 	// Getters
-	public JTable getTablaProductos() {return tablaProductos;}
-	public DefaultTableModel getModeloTabla() {return modeloTabla;}
-	public JTable getTablaCarrito() {return tablaCarrito;}
-	public DefaultTableModel getModeloCarrito() {return modeloCarrito;}
-	public JTextField getCampoDineroCliente() {return campoDineroCliente;}
-	public JLabel getEtiquetaTotal() {return etiquetaTotal;}
-	public JLabel getEtiquetaCambio() {return etiquetaCambio;}
-	public JButton getBotonAñadir() {return botonAñadir;}
-	public JButton getBotonEliminar() {return botonEliminar;}
-	public JButton getBotonFinalizar() {return botonFinalizar;}
-	
-	public void control(ControladorCajero ctr) {
+	public JTable getTablaProductos() { return tablaProductos; }
+	public DefaultTableModel getModeloTabla() { return modeloTabla; }
+	public JTable getTablaCarrito() { return tablaCarrito; }
+	public DefaultTableModel getModeloCarrito() { return modeloCarrito; }
+	public JTextField getCampoDineroCliente() { return campoDineroCliente; }
+	public JLabel getEtiquetaTotal() { return etiquetaTotal; }
+	public JLabel getEtiquetaCambio() { return etiquetaCambio; }
+	public JButton getBotonAñadir() { return botonAñadir; }
+	public JButton getBotonEliminar() { return botonEliminar; }
+	public JButton getBotonFinalizar() { return botonFinalizar; }
+
+	public void control(ControladorCajero ctr, ControladorTema ctrTema) {
 		botonAñadir.addActionListener(ctr);
 		botonEliminar.addActionListener(ctr);
 		botonFinalizar.addActionListener(ctr);
-	}
-	
-	public void controlTeclas(ControladorTema ctr) {
-		//Teclas
-		// Controlar que cuando se presione la tecla F12, se cambie el tema
-		addKeyListener(ctr);
+
+		addKeyListener(ctrTema);
 		setFocusable(true);
 	}
-
+	
 }

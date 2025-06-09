@@ -38,8 +38,7 @@ public class VistaSegunUsuario implements Serializable {
 			ControladorAdministrador controladorAdministrador = new ControladorAdministrador(vistaAdministrador);
 			
 			//Aádir los controladores a la vista
-			vistaAdministrador.controlAdministrador(controladorAdministrador);
-			vistaAdministrador.controlTeclas(controladorTema);
+			vistaAdministrador.controlAdministrador(controladorAdministrador, controladorTema);
 			
 			vistaAdministrador.setVisible(true);
 			vistaAdministrador.pack();
@@ -52,8 +51,7 @@ public class VistaSegunUsuario implements Serializable {
 			// Se le pasa su ID como responsable para futuras facturaciones
 			ControladorCajero controladorCajero = new ControladorCajero(vistaCajero, usuario.getId());
 			
-			vistaCajero.control(controladorCajero);
-			vistaCajero.controlTeclas(controladorTema);
+			vistaCajero.control(controladorCajero, controladorTema);
 		}
 
 		// Si el tipo de usuario no es reconocido

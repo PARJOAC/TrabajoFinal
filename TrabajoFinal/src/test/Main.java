@@ -13,13 +13,6 @@ import vista.VistaLogin;
  */
 public class Main {
 
-	/**
-	 * Método principal. Punto de entrada de la aplicación.
-	 *
-	 * @throws MiExcepcion si ocurre un error al iniciar el controlador
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 */
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, MiExcepcion {
 		// Crear la ventana de login para luego iniciar las vistas y controladores
 		// pertinentes
