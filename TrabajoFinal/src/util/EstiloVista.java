@@ -34,6 +34,7 @@ public class EstiloVista {
 				SwingUtilities.updateComponentTreeUI(window);
 			}
 
+
 		} catch (UnsupportedLookAndFeelException e) {
 			System.err.println("No se pudo aplicar el tema.");
 			e.printStackTrace();

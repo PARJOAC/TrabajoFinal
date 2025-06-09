@@ -4,21 +4,21 @@
 	<section name="java.lang.Class">
 		<item key="replaceBarOpen" value="false"/>
 		<list key="findhistory">
-			<item value="Usuario"/>
-			<item value="Contraseña"/>
-			<item value="centrar"/>
-			<item value="format"/>
-			<item value="String"/>
-			<item value="Jframe"/>
-			<item value="JFrame"/>
-			<item value="setText(&quot;&quot;)"/>
-			<item value="Has escr"/>
-			<item value="controlador"/>
-			<item value="FacturaResumen"/>
-			<item value="Event"/>
-			<item value="setC"/>
-			<item value="setControlador"/>
-			<item value="Caja"/>
+			<item value="error al fina"/>
+			<item value="error al modificar"/>
+			<item value="modificarProducto"/>
+			<item value="impuesto"/>
+			<item value="Descripción"/>
+			<item value="selecciona un prod"/>
+			<item value="descripcion"/>
+			<item value="Descripcion"/>
+			<item value="Descripci"/>
+			<item value=" new Producto"/>
+			<item value="cargar"/>
+			<item value="cre"/>
+			<item value="agregarProducto"/>
+			<item value="eliminarProducto"/>
+			<item value="Rellena todos"/>
 		</list>
 	</section>
 </section>

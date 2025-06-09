@@ -28,18 +28,17 @@ public class DAOFacturas {
 			throws SQLException, ClassNotFoundException, MiExcepcion {
 
 		// Consulta SQL que inserta una nueva factura con la fecha actual
-		String sql = "INSERT INTO facturas (fecha, usuarioResponsable, total, iva, efectivo, cambio) VALUES (NOW(), ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO facturas (fecha, usuarioResponsable, total, efectivo, cambio) VALUES (NOW(), ?, ?, ?, ?)";
 
 		// Se establece la conexión y se prepara la sentencia
-		try (Connection conn = BDConnection.getConnection();
-				PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+		try (Connection con = BDConnection.getConnection();
+				PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
 			// Asignación de parámetros a la sentencia
 			stmt.setInt(1, idUsuario);
 			stmt.setDouble(2, total);
-			stmt.setDouble(3, iva);
-			stmt.setDouble(4, efectivo);
-			stmt.setDouble(5, cambio);
+			stmt.setDouble(3, efectivo);
+			stmt.setDouble(4, cambio);
 
 			// Ejecución de la sentencia
 			stmt.executeUpdate();
@@ -101,7 +100,7 @@ public class DAOFacturas {
 		// Consulta SQL que une la tabla facturas con usuarios para obtener datos
 		// legibles
 		String sql = """
-				    SELECT f.idFactura, u.nombreUsuario AS usuario, f.total, f.iva, f.efectivo, f.cambio, f.fecha
+				    SELECT f.idFactura, u.nombreUsuario AS usuario, f.total, f.efectivo, f.cambio, f.fecha
 				    FROM facturas f
 				    JOIN usuarios u ON f.usuarioResponsable = u.idUsuario
 				    ORDER BY f.fecha DESC
@@ -115,7 +114,7 @@ public class DAOFacturas {
 			while (rs.next()) {
 				// Se crea un resumen por cada resultado
 				lista.add(new Factura(rs.getInt("idFactura"), rs.getString("usuario"), rs.getDouble("total"),
-						rs.getDouble("iva"), rs.getDouble("efectivo"), rs.getDouble("cambio"),
+						rs.getDouble("efectivo"), rs.getDouble("cambio"),
 						rs.getTimestamp("fecha").toString()));
 			}
 		}

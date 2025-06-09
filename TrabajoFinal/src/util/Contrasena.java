@@ -22,8 +22,7 @@ public class Contrasena implements Serializable {
 	private static final String ALGORITMO = "AES/ECB/PKCS5Padding";
 
 	/**
-	 * Cifra un texto plano (por ejemplo, una contraseña) y devuelve el resultado en
-	 * Base64.
+	 * Cifra un texto y devuelve el resultado en Base64.
 	 *
 	 * @param textoPlano texto sin cifrar
 	 * @return texto cifrado en formato Base64

@@ -1,0 +1,60 @@
+package bd;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import util.MiExcepcion;
+
+public class InsertarDatosTablas {
+	
+	public static void crearDatos() throws ClassNotFoundException, SQLException, MiExcepcion {
+		addDatosTablaUsuario();
+		addDatosTablaProductos();
+	}
+	
+	/**
+	 * Insertar Datos a Tabla USUARIOS
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws MiExcepcion
+	 */
+	private static void addDatosTablaUsuario() throws ClassNotFoundException, SQLException, MiExcepcion {
+
+		String tablaUsuarios = """
+				INSERT INTO `usuarios` (`idUsuario`, `nombreUsuario`, `contrasena`, `tipo`) VALUES
+								(1, 'admin', '8Ob2XvduFmzvi/MCYZyTPw==', 'Administrador');
+								""";
+
+		try (Connection con = BDConnection.getConnection(); Statement stmt = con.createStatement()) {
+			stmt.executeUpdate(tablaUsuarios);
+			System.out.println("Se ha añadido el usuario por defecto a la tabla USUARIOS.");
+		}
+	}
+
+	/**
+	 * Insertar Datos a Tabla PRODUCTOS
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws MiExcepcion
+	 */
+	private static void addDatosTablaProductos() throws ClassNotFoundException, SQLException, MiExcepcion {
+
+		String tablaUsuarios = """
+				INSERT INTO `productos` (`idProducto`, `nombre`, `descripcion`, `precio`, `categoria`, `marca`, `unidades`, `enVenta`, `fechaCaducidad`) VALUES
+								(1, 'Leche Entera', 'Esta es una descripción un poco larga', 0.95, 'Lacteos', 'SinMarca', 0, 1, '2025-12-31'),
+								(2, 'Pan de molde', '', 1.25, 'Panaderia', 'SinMarca', 398, 1, '2025-11-15'),
+								(3, 'Coca Cola lata', '', 0.8, 'Bebidas', 'CocaCola', 79, 1, '2026-01-01'),
+								(4, 'Detergente líquido', '', 3.95, 'Limpieza', 'Unilever', 190, 1, '2026-06-01'),
+								(5, 'Manzanas', '', 2.2, 'FrutasVerduras', 'SinMarca', 16, 1, '2025-06-30'),
+								(7, 'Coca Cola lata', '', 0.81, 'Bebidas', 'CocaCola', 100, 1, '2026-01-01');
+																""";
+
+		try (Connection conn = BDConnection.getConnection(); Statement stmt = conn.createStatement()) {
+			stmt.executeUpdate(tablaUsuarios);
+			System.out.println("Se ha añadido el usuario por defecto a la tabla PRODUCTOS.");
+		}
+	}
+}

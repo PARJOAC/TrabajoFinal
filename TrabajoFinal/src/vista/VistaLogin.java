@@ -2,6 +2,8 @@ package vista;
 
 import javax.swing.*;
 
+import controlador.ControladorLogin;
+import controlador.ControladorTema;
 import enumeraciones.Temas;
 import util.EstiloVista;
 import util.Logotipo;
@@ -83,20 +85,20 @@ public class VistaLogin extends JFrame implements Serializable {
 
 		// Configuración final
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setVisible(true);
 	}
 
 	// Getters
+	public JTextField getCampoUsuario() {return campoUsuario;}
+	public JPasswordField getCampoContrasena() {return campoContrasena;}
+	public JButton getBotonLogin() {return botonLogin;}
 
-	public JTextField getCampoUsuario() {
-		return campoUsuario;
+	public void control(ControladorLogin ctr) {
+		botonLogin.addActionListener(ctr); // Escucha el clic del botón
 	}
 
-	public JPasswordField getCampoContrasena() {
-		return campoContrasena;
-	}
-
-	public JButton getBotonLogin() {
-		return botonLogin;
+	public void controlTema(ControladorTema ctr) {
+		addKeyListener(ctr);
+		setFocusable(true); // Le da permiso para tener el foco.
+		requestFocusInWindow(); // Le pide el foco activamente.
 	}
 }

@@ -24,11 +24,11 @@ public class DAOCajeros {
 	 * @param cambio    Dinero devuelto al cliente
 	 * @return ID de la factura recién creada
 	 */
-	public int crearFactura(int idUsuario, double total, double iva, double efectivo, double cambio)
+	public int crearFactura(int idUsuario, double total, double efectivo, double cambio)
 			throws SQLException, ClassNotFoundException, MiExcepcion {
 
 		// Sentencia SQL para insertar una factura, con la fecha actual (NOW())
-		String sql = "INSERT INTO facturas (fecha, usuarioResponsable, total, iva, efectivo, cambio) VALUES (NOW(), ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO facturas (fecha, usuarioResponsable, total, efectivo, cambio) VALUES (NOW(), ?, ?, ?, ?)";
 
 		// Se crea una conexión y se prepara la sentencia SQL para obtener el ID
 		// generado
@@ -38,9 +38,8 @@ public class DAOCajeros {
 			// Se rellenan los valores de la sentencia preparada con los datos recibidos
 			stmt.setInt(1, idUsuario);
 			stmt.setDouble(2, total);
-			stmt.setDouble(3, iva);
-			stmt.setDouble(4, efectivo);
-			stmt.setDouble(5, cambio);
+			stmt.setDouble(3, efectivo);
+			stmt.setDouble(4, cambio);
 
 			// Se ejecuta la inserción en la base de datos
 			stmt.executeUpdate();
@@ -77,7 +76,7 @@ public class DAOCajeros {
 		String sql = "INSERT INTO detalles_factura (idFactura, idProducto, nombreProducto, precioUnitario, cantidad, subtotal) VALUES (?, ?, ?, ?, ?, ?)";
 
 		// Se establece la conexión y se prepara la sentencia
-		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection con = BDConnection.getConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
 
 			// Se pasan los valores a la sentencia SQL
 			stmt.setInt(1, idFactura);
@@ -111,7 +110,7 @@ public class DAOCajeros {
 		String sql = "SELECT nombreProducto, precioUnitario, cantidad, subtotal FROM detalles_factura WHERE idFactura = ?";
 
 		// Se establece la conexión y se prepara la sentencia
-		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection con = BDConnection.getConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
 
 			// Se asigna el ID de la factura al parámetro de la consulta
 			stmt.setInt(1, idFactura);

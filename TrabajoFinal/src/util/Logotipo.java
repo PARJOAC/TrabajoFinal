@@ -47,7 +47,7 @@ public class Logotipo {
 		// Si existe la ruta, obtiene y escala la imagen
 		if (ruta != null) {
 			ImageIcon icono = new ImageIcon(ruta);
-			// Escala suavemente a 150x150 píxeles
+			// Escalar a 150x150 píxeles
 			imagenEscalada = icono.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
 		}
 

@@ -48,61 +48,21 @@ public class Usuario {
 		this(nombre, password, TipoUsuario.Cajero); // Tipo por defecto
 	}
 
-	// ========================= MÉTODOS GETTER Y SETTER =========================
+	// Métodos Getter y Setter
+	public int getId() {return id;}
+	public void setId(int id) {this.id = id;}
 
-	/**
-	 * Devuelve el ID del usuario.
-	 */
-	public int getId() {
-		return id;
-	}
+	public String getNombre() {return nombre;}
+	public void setNombre(String nombre) {this.nombre = nombre;}
 
-	public void setId(int id) {
-		this.id = id;
-	}
+	public String getPassword() {return password;}
+	public void setPassword(String password) throws MiExcepcion {this.password = password;}
 
-	/**
-	 * Devuelve el nombre del usuario.
-	 */
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-	/**
-	 * Devuelve la contraseña cifrada.
-	 */
-	public String getPassword() {
-		return password;
-	}
-
-	/**
-	 * Establece directamente la contraseña (debe venir ya cifrada si se usa este
-	 * método). No se cifra aquí para evitar cifrados dobles al recuperar de base de
-	 * datos.
-	 */
-	public void setPassword(String password) throws MiExcepcion {
-		this.password = password;
-	}
-
-	/**
-	 * Devuelve el tipo de usuario.
-	 */
-	public TipoUsuario getTipoUsuario() {
-		return tipoUsuario;
-	}
-
-	public void setTipoUsuario(TipoUsuario tipoUsuario) {
-		this.tipoUsuario = tipoUsuario;
-	}
+	public TipoUsuario getTipoUsuario() {return tipoUsuario;}
+	public void setTipoUsuario(TipoUsuario tipoUsuario) {this.tipoUsuario = tipoUsuario;}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(id, nombre, password, tipoUsuario);
-	}
+	public int hashCode() {return Objects.hash(id, nombre, password, tipoUsuario);}
 
 	@Override
 	public boolean equals(Object obj) {

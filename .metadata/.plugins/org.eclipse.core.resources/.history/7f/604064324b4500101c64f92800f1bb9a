@@ -1,0 +1,241 @@
+package controlador;
+
+import bd.DAOFacturas;
+import bd.DAOProductos;
+import enumeraciones.Emergente;
+import modelo.Producto;
+import util.Dialogos;
+import util.MiExcepcion;
+import vista.VistaCajeros;
+
+import javax.swing.table.DefaultTableModel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+/**
+ * Controlador principal para la vista del cajero. Gestiona la interacción con
+ * los productos, el carrito de compra y la creación de facturas.
+ */
+public class ControladorCajero implements ActionListener {
+
+	private final DAOProductos daoProductos; // Acceso a productos en la base de datos
+	private final VistaCajeros vista; // Referencia a la vista del cajero
+	private final DAOFacturas daoFacturas; // Acceso a las facturas
+	private final int idUsuario; // ID del cajero que ha iniciado sesión
+
+	/**
+	 * Controlador inicial
+	 * 
+	 * @param vista
+	 * @param idUsuario
+	 */
+	public ControladorCajero(VistaCajeros vista, int idUsuario) {
+		this.vista = vista;
+		this.daoProductos = new DAOProductos();
+		this.daoFacturas = new DAOFacturas();
+		this.idUsuario = idUsuario;
+
+		// Carga los productos al iniciar la vista del cajero
+		cargarProductos();
+	}
+
+	/**
+	 * Manejo de eventos según el botón presionado.
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object fuente = e.getSource();
+
+		if (fuente == vista.getBotonAñadir())
+			añadirAlCarrito();
+		else if (fuente == vista.getBotonEliminar())
+			eliminarDelCarrito();
+		else if (fuente == vista.getBotonFinalizar())
+			try {
+				finalizarCompra();
+			} catch (MiExcepcion e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+	}
+
+	/**
+	 * Carga todos los productos en venta desde la base de datos y los muestra en la
+	 * tabla.
+	 */
+	public void cargarProductos() {
+		try {
+			DefaultTableModel modelo = vista.getModeloTabla();
+			modelo.setRowCount(0); // Limpia cualquier fila previa de la tabla
+			List<Producto> lista = daoProductos.listarProductos(); // Obtiene los productos desde la BBDD
+
+			// Añade a la tabla solo los productos que están en venta
+			lista.stream().filter(p -> p.isEnVenta()).forEach(p -> {
+				String[] arrayProducto = { p.getNombre(), String.valueOf(p.getPrecio()),
+						String.valueOf(p.getUnidades()) };
+				modelo.addRow(arrayProducto);
+			});
+
+		} catch (MiExcepcion e) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al cargar productos: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Elimina un producto del carrito si hay una fila seleccionada.
+	 */
+	public void eliminarDelCarrito() {
+		int fila = vista.getTablaCarrito().getSelectedRow(); // Fila seleccionada en el carrito
+		if (fila == -1) {
+			Dialogos.avisoDialogo(Emergente.Error, "Selecciona un producto del carrito para eliminar.");
+			return;
+		}
+		vista.getModeloCarrito().removeRow(fila); // Elimina la fila del carrito
+		actualizarTotales(); // Recalcula totales tras eliminar producto
+	}
+
+	/**
+	 * Añade un producto al carrito, o aumenta su cantidad si ya está añadido.
+	 */
+	public void añadirAlCarrito() {
+		int fila = vista.getTablaProductos().getSelectedRow(); // Fila seleccionada en la tabla de productos
+		if (fila == -1) {
+			Dialogos.avisoDialogo(Emergente.Error, "Selecciona un producto para añadir al carrito.");
+			return;
+		}
+
+		// Obtiene los datos del producto seleccionado
+		DefaultTableModel modeloProductos = vista.getModeloTabla();
+		String nombre = modeloProductos.getValueAt(fila, 0).toString();
+		double precio = Double.parseDouble(modeloProductos.getValueAt(fila, 1).toString().replace(",", "."));
+		int stockDisponible = Integer.parseInt(modeloProductos.getValueAt(fila, 2).toString());
+
+		// Busca si el producto ya está en el carrito
+		DefaultTableModel modeloCarrito = vista.getModeloCarrito();
+		boolean existe = false;
+
+		for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
+			if (modeloCarrito.getValueAt(i, 0).equals(nombre)) {
+				int cantidadActual = Integer.parseInt(modeloCarrito.getValueAt(i, 2).toString());
+
+				// Verifica si hay suficiente stock para añadir una unidad más
+				if (cantidadActual >= stockDisponible) {
+					Dialogos.avisoDialogo(Emergente.Error, "No se pueden añadir más unidades.");
+					return;
+				}
+
+				// Aumenta la cantidad y actualiza el subtotal
+				int nuevaCantidad = cantidadActual + 1;
+				double subtotal = nuevaCantidad * precio;
+				modeloCarrito.setValueAt(nuevaCantidad, i, 2);
+				modeloCarrito.setValueAt((Math.round(subtotal * 100.0) / 100.0), i, 3);
+				existe = true;
+				break;
+			}
+		}
+
+		// Si no está en el carrito, se añade como nuevo producto
+		if (!existe) {
+			if (stockDisponible <= 0) {
+				Dialogos.avisoDialogo(Emergente.Error, "Este producto no tiene stock disponible.");
+				return;
+			}
+			modeloCarrito.addRow(new Object[] { nombre, (Math.round(precio * 100.0) / 100.0), 1,
+					(Math.round(precio * 100.0) / 100.0) });
+		}
+
+		actualizarTotales(); // Recalcula totales tras añadir producto
+	}
+
+	/**
+	 * Finaliza la compra: crea la factura, registra los detalles, descuenta el
+	 * stock y muestra el cambio.
+	 */
+	public void finalizarCompra() throws MiExcepcion {
+		try {
+			if (vista.getTablaCarrito().getRowCount() <= 0) {
+				Dialogos.avisoDialogo(Emergente.Advertencia, "Debe haber algo en el carrito.");
+				return;
+			}
+
+			// Cálculo de totales
+			double subtotalTotal = calcularTotal();
+			double impuesto = subtotalTotal * 0.21;
+			double totalConIVA = subtotalTotal + impuesto;
+
+			// Dinero introducido por el cliente
+			double dineroCliente = Double.parseDouble(vista.getCampoDineroCliente().getText().trim());
+
+			// Comprobación de si el dinero entregado cubre el total
+			if (dineroCliente < totalConIVA) {
+				Dialogos.avisoDialogo(Emergente.Advertencia, "El dinero entregado no cubre el total.");
+				return;
+			}
+
+			double cambio = dineroCliente - totalConIVA;
+			DefaultTableModel carrito = vista.getModeloCarrito();
+
+			// Crear factura principal
+			int idFactura = daoFacturas.crearFactura(idUsuario, subtotalTotal, impuesto, dineroCliente, cambio);
+
+			// Registrar detalles de cada producto comprado y actualizar stock
+			for (int i = 0; i < carrito.getRowCount(); i++) {
+				String nombre = carrito.getValueAt(i, 0).toString();
+				double precio = Double.parseDouble(carrito.getValueAt(i, 1).toString().replace(",", "."));
+				double subtotal = Double.parseDouble(carrito.getValueAt(i, 3).toString().replace(",", "."));
+				int cantidad = Integer.parseInt(carrito.getValueAt(i, 2).toString());
+
+				Producto producto = daoProductos.buscarPorNombre(nombre);
+				daoProductos.actualizarUnidades(producto.getId(), producto.getUnidades() - cantidad); // Resta stock
+				daoFacturas.insertarDetalle(idFactura, Integer.parseInt(producto.getId()), nombre, precio, cantidad,
+						subtotal); // Guarda detalle
+			}
+
+			// Muestra cambio y mensaje de éxito
+			vista.getEtiquetaCambio().setText("Cambio: " + (Math.round(cambio * 100.0) / 100.0) + " €");
+
+			Dialogos.avisoDialogo(Emergente.Informacion, "Compra finalizada correctamente.\nImporte recibido: "
+					+ dineroCliente + " €\nCambio: " + (Math.round(cambio * 100.0) / 100.0) + " €");
+
+			// Limpieza de interfaz
+			vista.getModeloCarrito().setRowCount(0);
+			vista.getCampoDineroCliente().setText("");
+			cargarProductos();
+			actualizarTotales();
+
+		} catch (NumberFormatException e) {
+			Dialogos.avisoDialogo(Emergente.Error, "Introduce una cantidad válida en el campo de efectivo.");
+		} catch (Exception e) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al finalizar compra: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Calcula y actualiza el total e IVA en la interfaz.
+	 */
+	private void actualizarTotales() {
+		double total = calcularTotal();
+		double impuesto = total * 0.21;
+		vista.getEtiquetaTotal().setText("Total: " + (Math.round(total + impuesto * 100.0) / 100.0) + " €");
+		vista.getEtiquetaImpuesto().setText("IVA (21%): " + (Math.round(impuesto * 100.0) / 100.0) + " €");
+		vista.getEtiquetaCambio().setText("Cambio: 0.00 €");
+	}
+
+	/**
+	 * Suma los subtotales de los productos del carrito.
+	 *
+	 * @return suma total sin IVA
+	 */
+	private double calcularTotal() {
+		DefaultTableModel modeloCarrito = vista.getModeloCarrito();
+		double total = 0;
+		for (int i = 0; i < modeloCarrito.getRowCount(); i++) {
+			String valor = modeloCarrito.getValueAt(i, 3).toString().replace(",", ".");
+			total += Double.parseDouble(valor);
+		}
+		return total;
+	}
+
+}

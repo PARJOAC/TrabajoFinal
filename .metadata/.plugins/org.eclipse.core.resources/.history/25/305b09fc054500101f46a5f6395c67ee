@@ -1,0 +1,37 @@
+package test;
+
+import java.sql.SQLException;
+
+import bd.CrearTablas;
+import bd.InsertarDatosTablas;
+import controlador.ControladorLogin;
+import util.MiExcepcion;
+import vista.VistaLogin;
+
+/**
+ * Clase principal que lanza la aplicación. Aplica el estilo visual y muestra la
+ * pantalla de login.
+ */
+public class Main {
+
+	/**
+	 * Método principal. Punto de entrada de la aplicación.
+	 *
+	 * @throws MiExcepcion si ocurre un error al iniciar el controlador
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
+	 */
+	public static void main(String[] args) throws MiExcepcion, ClassNotFoundException, SQLException {
+		// Crear la ventana de login para luego iniciar las vistas y controladores
+		// pertinentes
+		
+		// Crear todas las tablas si no existen
+		CrearTablas.crearTablas();
+		InsertarDatosTablas.crearDatos();
+				
+		VistaLogin vistaInicial = new VistaLogin();
+
+		// Aplicar el controlador de los eventos a la vista de login
+		new ControladorLogin(vistaInicial);
+	}
+}

@@ -21,20 +21,19 @@ public class DAOProductos {
 	 * @throws MiExcepcion Si ocurre algún error al insertar
 	 */
 	public void crearProducto(Producto producto) throws MiExcepcion {
-		String sql = "INSERT INTO productos (nombre, descripcion, precio, categoria, marca, unidades, enVenta, fechaCaducidad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO productos (nombre, precio, categoria, marca, unidades, enVenta, fechaCaducidad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 		// Try-with-resources para asegurar cierre automático de recursos
-		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection con = BDConnection.getConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
 
 			// Asignación de valores a la sentencia SQL
 			stmt.setString(1, producto.getNombre());
-			stmt.setString(2, producto.getDescripcion());
-			stmt.setDouble(3, producto.getPrecio());
-			stmt.setString(4, producto.getCategoria().name()); // Enum a string
-			stmt.setString(5, producto.getMarca().name()); // Enum a string
-			stmt.setInt(6, producto.getUnidades());
-			stmt.setBoolean(7, producto.isEnVenta());
-			stmt.setDate(8, Date.valueOf(producto.getFechaCaducidad()));
+			stmt.setDouble(2, producto.getPrecio());
+			stmt.setString(3, producto.getCategoria().name()); // Enum a string
+			stmt.setString(4, producto.getMarca().name()); // Enum a string
+			stmt.setInt(5, producto.getUnidades());
+			stmt.setBoolean(6, producto.isEnVenta());
+			stmt.setDate(7, Date.valueOf(producto.getFechaCaducidad()));
 
 			// Ejecución de la inserción
 			stmt.executeUpdate();
@@ -63,9 +62,8 @@ public class DAOProductos {
 			while (rs.next()) {
 				try {
 					Producto productoNuevo = new Producto(rs.getString("nombre"), rs.getDouble("precio"),
-							rs.getString("descripcion"), Categoria.valueOf(rs.getString("categoria")),
-							Marca.valueOf(rs.getString("marca")), rs.getInt("unidades"), rs.getBoolean("enVenta"),
-							rs.getDate("fechaCaducidad").toString());
+							Categoria.valueOf(rs.getString("categoria")), Marca.valueOf(rs.getString("marca")),
+							rs.getInt("unidades"), rs.getBoolean("enVenta"), rs.getDate("fechaCaducidad").toString());
 					// Asignamos también su ID
 					productoNuevo.setId(String.valueOf(rs.getInt("idProducto")));
 					lista.add(productoNuevo);
@@ -112,19 +110,18 @@ public class DAOProductos {
 	 * @throws MiExcepcion Si ocurre un error o el producto no existe
 	 */
 	public void modificarProducto(Producto producto) throws MiExcepcion {
-		String sql = "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, categoria = ?, marca = ?, unidades = ?, enVenta = ?, fechaCaducidad = ? WHERE idProducto = ?";
+		String sql = "UPDATE productos SET nombre = ?, precio = ?, categoria = ?, marca = ?, unidades = ?, enVenta = ?, fechaCaducidad = ? WHERE idProducto = ?";
 
 		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
 			stmt.setString(1, producto.getNombre());
-			stmt.setString(2, producto.getDescripcion());
-			stmt.setDouble(3, producto.getPrecio());
-			stmt.setString(4, producto.getCategoria().name());
-			stmt.setString(5, producto.getMarca().name());
-			stmt.setInt(6, producto.getUnidades());
-			stmt.setBoolean(7, producto.isEnVenta());
-			stmt.setDate(8, Date.valueOf(producto.getFechaCaducidad()));
-			stmt.setInt(9, Integer.parseInt(producto.getId()));
+			stmt.setDouble(2, producto.getPrecio());
+			stmt.setString(3, producto.getCategoria().name());
+			stmt.setString(4, producto.getMarca().name());
+			stmt.setInt(5, producto.getUnidades());
+			stmt.setBoolean(6, producto.isEnVenta());
+			stmt.setDate(7, Date.valueOf(producto.getFechaCaducidad()));
+			stmt.setInt(8, Integer.parseInt(producto.getId()));
 
 			// Si no se actualiza ninguna fila, significa que no existe ese producto
 			if (stmt.executeUpdate() == 0) {
@@ -153,9 +150,8 @@ public class DAOProductos {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
 					Producto p = new Producto(rs.getString("nombre"), rs.getDouble("precio"),
-							rs.getString("descripcion"), Categoria.valueOf(rs.getString("categoria")),
-							Marca.valueOf(rs.getString("marca")), rs.getInt("unidades"), rs.getBoolean("enVenta"),
-							rs.getDate("fechaCaducidad").toString());
+							Categoria.valueOf(rs.getString("categoria")), Marca.valueOf(rs.getString("marca")),
+							rs.getInt("unidades"), rs.getBoolean("enVenta"), rs.getDate("fechaCaducidad").toString());
 					p.setId(String.valueOf(rs.getInt("idProducto")));
 					return p;
 				} else {
@@ -209,9 +205,8 @@ public class DAOProductos {
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
 					Producto p = new Producto(rs.getString("nombre"), rs.getDouble("precio"),
-							rs.getString("descripcion"), Categoria.valueOf(rs.getString("categoria")),
-							Marca.valueOf(rs.getString("marca")), rs.getInt("unidades"), rs.getBoolean("enVenta"),
-							rs.getDate("fechaCaducidad").toString());
+							Categoria.valueOf(rs.getString("categoria")), Marca.valueOf(rs.getString("marca")),
+							rs.getInt("unidades"), rs.getBoolean("enVenta"), rs.getDate("fechaCaducidad").toString());
 					p.setId(String.valueOf(rs.getInt("idProducto")));
 					return p;
 

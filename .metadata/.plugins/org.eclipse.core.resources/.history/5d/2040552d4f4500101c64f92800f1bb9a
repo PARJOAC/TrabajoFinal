@@ -1,0 +1,69 @@
+package controlador;
+
+import bd.DAOProductos;
+import enumeraciones.Categoria;
+import enumeraciones.Emergente;
+import enumeraciones.Marca;
+import modelo.Producto;
+import util.Dialogos;
+import util.MiExcepcion;
+import vista.VistaAdministrador;
+
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+/**
+ * Controlador que gestiona la lógica de productos en la vista del
+ * administrador. Permite agregar, modificar, eliminar y listar productos en una
+ * tabla.
+ */
+public class ControladorProducto implements ActionListener, ListSelectionListener {
+
+	private final VistaAdministrador vista; // Referencia a la vista del administrador
+	private final DAOProductos daoProductos; // Acceso a la base de datos de productos
+
+	/**
+	 * Constructor: vincula los botones de la vista con sus acciones
+	 * correspondientes.
+	 *
+	 * @param vista vista del administrador con componentes de gestión de productos
+	 */
+	public ControladorProducto(VistaAdministrador vista) {
+		this.vista = vista;
+		this.daoProductos = new DAOProductos();
+
+		// Asigna acciones a los botones de la interfaz
+		vista.getBotonAgregarProducto().addActionListener(this);
+		vista.getBotonModificarProducto().addActionListener(this);
+		vista.getBotonEliminarProducto().addActionListener(this);
+		vista.getTablaProductos().getSelectionModel().addListSelectionListener(this);
+
+		// Carga inicial de la tabla de productos
+		cargarTabla();
+	}
+
+	/**
+	 * Manejo de eventos según el botón presionado.
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object fuente = e.getSource();
+
+		if (fuente == vista.getBotonAgregarProducto())
+			agregarProducto();
+		else if (fuente == vista.getBotonModificarProducto())
+			modificarProducto();
+		else if (fuente == vista.getBotonEliminarProducto())
+			eliminarProducto();
+		else if (fuente == vista.getTablaProductos())
+			modificarProducto();
+	}
+
+	
+
+}

@@ -1,0 +1,35 @@
+package controlador;
+
+import bd.DAOFacturas;
+import enumeraciones.Emergente;
+import modelo.Factura;
+import util.Dialogos;
+import util.MiExcepcion;
+import vista.VistaAdministrador;
+
+import javax.swing.table.DefaultTableModel;
+import java.sql.SQLException;
+import java.util.List;
+
+/**
+ * Controlador encargado de manejar la carga y visualización de facturas en la
+ * vista del administrador.
+ */
+public class ControladorFactura {
+
+	private final VistaAdministrador vista; // Referencia a la vista del administrador
+	private final DAOFacturas dao; // Acceso a la base de datos de facturas
+
+	/**
+	 * Constructor. Inicializa la vista y carga las facturas en la tabla.
+	 *
+	 * @param vista VistaAdministrador que contiene la tabla de facturas
+	 * @throws MiExcepcion si ocurre un error en la lógica de negocio
+	 */
+	public ControladorFactura(VistaAdministrador vista) throws MiExcepcion {
+		this.vista = vista;
+		this.dao = new DAOFacturas();
+		cargarFacturasEnTabla(); // Se carga la información al inicializar
+	}
+
+}

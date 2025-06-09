@@ -1,0 +1,134 @@
+package controlador;
+
+import bd.DAOUsuarios;
+import enumeraciones.Emergente;
+import enumeraciones.TipoUsuario;
+import modelo.Usuario;
+import util.Dialogos;
+import util.MiExcepcion;
+import vista.VistaAdministrador;
+
+import javax.swing.table.DefaultTableModel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+/**
+ * Controlador que gestiona la lógica relacionada con los usuarios en la vista
+ * del administrador. Permite crear, buscar y listar usuarios.
+ */
+public class ControladorUsuario implements ActionListener {
+
+	private final VistaAdministrador vista; // Vista que contiene los componentes de usuarios
+	private final DAOUsuarios daoUsuarios; // DAO para operaciones con la tabla de usuarios
+
+	/**
+	 * Constructor. Enlaza los botones con sus acciones y carga los usuarios.
+	 *
+	 * @param vista vista del administrador
+	 */
+	public ControladorUsuario(VistaAdministrador vista) {
+		this.vista = vista;
+		this.daoUsuarios = new DAOUsuarios();
+
+		// Asignar eventos a botones de la vista
+		this.vista.getBotonCrear().addActionListener(this);
+		this.vista.getBotonBuscar().addActionListener(this);
+
+		// Carga inicial de la tabla de usuarios
+		cargarUsuariosEnTabla();
+	}
+
+	/**
+	 * Manejo de eventos según el botón presionado.
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object fuente = e.getSource();
+
+		if (fuente == vista.getBotonCrear())
+			crearUsuario();
+		else if (fuente == vista.getBotonBuscar())
+			buscarUsuario();
+	}
+
+	/**
+	 * Crea un nuevo usuario a partir de los campos del formulario. Muestra errores
+	 * si faltan datos o ocurre un problema al guardar.
+	 */
+	private void crearUsuario() {
+		// Obtener valores del formulario
+		String nombre = vista.getCampoUsuario().getText().trim();
+		String contrasena = new String(vista.getCampoContrasena().getPassword()).trim();
+		TipoUsuario tipoSeleccionado = (TipoUsuario) vista.getComboTipoUsuario().getSelectedItem();
+
+		// Validar campos obligatorios
+		if (nombre.isEmpty() || contrasena.isEmpty()) {
+			Dialogos.avisoDialogo(Emergente.Error, "Rellena todos los campos.");
+			return;
+		}
+
+		try {
+			// Crear y guardar nuevo usuario
+			daoUsuarios.crearUsuario(new Usuario(nombre, contrasena, tipoSeleccionado));
+			limpiarFormulario(); // Limpiar los campos
+			cargarUsuariosEnTabla(); // Actualizar tabla
+		} catch (MiExcepcion ex) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al crear usuario: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Filtra la tabla de usuarios mostrando solo aquellos que coincidan con el
+	 * texto buscado.
+	 */
+	private void buscarUsuario() {
+		String texto = vista.getCampoBuscar().getText().trim().toLowerCase(); // Texto introducido por el usuario
+
+		try {
+			List<Usuario> lista = daoUsuarios.listarUsuarios(); // Obtener lista completa
+			DefaultTableModel modelo = vista.getModeloTabla();
+			modelo.setRowCount(0); // Limpiar tabla
+
+			// Añadir solo los que contienen el texto buscado
+			lista.stream().filter(u -> u.getNombre().toLowerCase().contains(texto)).forEach(
+					u -> {
+						String[] arrayUsuario = { u.getNombre(), u.getTipoUsuario().getDescripcionUsuario() };
+						modelo.addRow(arrayUsuario);
+					});
+		} catch (MiExcepcion e) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al buscar el usuario: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Carga todos los usuarios disponibles y los muestra en la tabla.
+	 */
+	private void cargarUsuariosEnTabla() {
+		try {
+			List<Usuario> lista = daoUsuarios.listarUsuarios(); // Consulta todos los usuarios
+			DefaultTableModel modelo = vista.getModeloTabla();
+			modelo.setRowCount(0); // Vacía la tabla antes de rellenarla
+
+			lista.forEach(
+					u -> {
+						String[] arrayUsuario = { u.getNombre(), u.getTipoUsuario().getDescripcionUsuario() };
+						modelo.addRow(arrayUsuario);
+						});
+					}
+		} catch (MiExcepcion e) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al cargar usuarios: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Limpia los campos del formulario de usuario.
+	 */
+	private void limpiarFormulario() {
+		vista.getCampoUsuario().setText("");
+		vista.getCampoContrasena().setText("");
+		vista.getComboTipoUsuario().setSelectedIndex(0);
+	}
+
+}

@@ -1,0 +1,149 @@
+package bd;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import util.MiExcepcion;
+
+public class CrearTablas {
+
+	/**
+	 * Crear todas las tablas
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws MiExcepcion
+	 */
+	public static void crearTablas() throws ClassNotFoundException, SQLException, MiExcepcion {
+		crearTablaUsuarios();
+		crearTablaProductos();
+		crearTablaFacturas();
+		crearTablaConexionFacturaDetalles();
+	}
+
+	/**
+	 * Crear la tabla de USUARIOS
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws MiExcepcion
+	 */
+	private static void crearTablaUsuarios() throws ClassNotFoundException, SQLException, MiExcepcion {
+
+		String tablaUsuarios = """
+				CREATE TABLE IF NOT EXISTS `usuarios` (
+								  `idUsuario` int(11) NOT NULL AUTO_INCREMENT,
+								  `nombreUsuario` varchar(50) NOT NULL,
+								  `contrasena` varchar(200) NOT NULL,
+								  `tipo` enum('Administrador','Cajero') NOT NULL DEFAULT 'Cajero',
+								  PRIMARY KEY (`idUsuario`),
+								  UNIQUE KEY `nombreUsuario` (`nombreUsuario`)
+								) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+															    """;
+
+		try (Connection con = BDConnection.getConnection(); Statement stmt = con.createStatement()) {
+			ResultSet rs = con.getMetaData().getTables(null, null, "usuarios", null);
+			while(rs.next()) {
+				
+			}
+			System.out.println(con.getMetaData().getTables("usuario", null, null, null));
+			
+			stmt.executeUpdate(tablaUsuarios);
+			System.out.println("Se ha creado la tabla USUARIOS.");
+		}
+	}
+
+	/**
+	 * Crear la tabla de PRODUCTOS
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws MiExcepcion
+	 */
+	private static void crearTablaProductos() throws ClassNotFoundException, SQLException, MiExcepcion {
+
+		String tablaUsuarios = """
+				CREATE TABLE IF NOT EXISTS `productos` (
+								  `idProducto` int(11) NOT NULL AUTO_INCREMENT,
+								  `nombre` varchar(100) NOT NULL,
+								  `descripcion` varchar(500) DEFAULT 'No se ha proporcionado una descripción.',
+								  `precio` double NOT NULL,
+								  `categoria` enum('SinCategoria','Limpieza','Alimentacion','Bebidas','Panaderia','Carniceria','Pescaderia','Congelados','Lacteos','FrutasVerduras','HigienePersonal','CuidadoBebe','Perfumeria','Mascotas','Drogueria','Papeleria','Electrodomesticos','Ropa','Ferreteria','Jugueteria','Tecnologia') DEFAULT 'SinCategoria',
+								  `marca` enum('SinMarca','Nestle','CocaCola','Pepsi','Danone','Loreal','Nike','Adidas','Samsung','Apple','Sony','Unilever','Lego','Henkel','Oralb','Philips','Bosch','Zara','Ikea','Honda') DEFAULT 'SinMarca',
+								  `unidades` int(11) NOT NULL DEFAULT 0,
+								  `enVenta` tinyint(1) DEFAULT 1,
+								  `fechaCaducidad` date DEFAULT NULL,
+								  PRIMARY KEY (`idProducto`)
+								) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+											    """;
+
+		try (Connection con = BDConnection.getConnection(); Statement stmt = con.createStatement()) {
+			stmt.executeUpdate(tablaUsuarios);
+			System.out.println("Se ha creado la tabla PRODUCTOS.");
+		}
+	}
+
+	/**
+	 * Crear la tabla de FACTURAS
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws MiExcepcion
+	 */
+	private static void crearTablaFacturas() throws ClassNotFoundException, SQLException, MiExcepcion {
+
+		String tablaUsuarios = """
+				CREATE TABLE IF NOT EXISTS `facturas` (
+								  `idFactura` int(11) NOT NULL AUTO_INCREMENT,
+								  `fecha` datetime DEFAULT CURRENT_TIMESTAMP,
+								  `usuarioResponsable` int(11) NOT NULL,
+								  `total` double NOT NULL,
+								  `iva` double NOT NULL,
+								  `efectivo` double NOT NULL,
+								  `cambio` double NOT NULL,
+								  PRIMARY KEY (`idFactura`),
+								  KEY `usuarioResponsable` (`usuarioResponsable`),
+								  CONSTRAINT `facturas_ibfk_1` FOREIGN KEY (`usuarioResponsable`) REFERENCES `usuarios` (`idUsuario`)
+								) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+															    """;
+
+		try (Connection conn = BDConnection.getConnection(); Statement stmt = conn.createStatement()) {
+			stmt.executeUpdate(tablaUsuarios);
+			System.out.println("Se ha creado la tabla FACTURAS.");
+		}
+	}
+
+	/**
+	 * Crear la tabla de FACTURA_DETALLES
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 * @throws MiExcepcion
+	 */
+	private static void crearTablaConexionFacturaDetalles() throws ClassNotFoundException, SQLException, MiExcepcion {
+
+		String tablaUsuarios = """
+				CREATE TABLE IF NOT EXISTS `factura_detalles` (
+								  `idDetalle` int(11) NOT NULL AUTO_INCREMENT,
+								  `idFactura` int(11) NOT NULL,
+								  `idProducto` int(11) NOT NULL,
+								  `nombreProducto` varchar(100) NOT NULL,
+								  `precioUnitario` double NOT NULL,
+								  `cantidad` int(11) NOT NULL,
+								  `subtotal` double NOT NULL,
+								  PRIMARY KEY (`idDetalle`),
+								  KEY `idFactura` (`idFactura`),
+								  KEY `idProducto` (`idProducto`),
+								  CONSTRAINT `factura_detalles_ibfk_1` FOREIGN KEY (`idFactura`) REFERENCES `facturas` (`idFactura`) ON DELETE CASCADE,
+								  CONSTRAINT `factura_detalles_ibfk_2` FOREIGN KEY (`idProducto`) REFERENCES `productos` (`idProducto`)
+								) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+																			    """;
+
+		try (Connection conn = BDConnection.getConnection(); Statement stmt = conn.createStatement()) {
+			stmt.executeUpdate(tablaUsuarios);
+			System.out.println("Se ha creado la tabla FACTURA_DETALLES.");
+		}
+	}
+}

@@ -26,21 +26,16 @@ public class ControladorCajero implements ActionListener {
 	private final int idUsuario; // ID del cajero que ha iniciado sesión
 
 	/**
-	 * Constructor: configura la vista y carga los productos disponibles.
+	 * Controlador inicial
+	 * 
+	 * @param vista
+	 * @param idUsuario
 	 */
 	public ControladorCajero(VistaCajeros vista, int idUsuario) {
 		this.vista = vista;
 		this.daoProductos = new DAOProductos();
 		this.daoFacturas = new DAOFacturas();
 		this.idUsuario = idUsuario;
-
-		// Añadir producto al carrito
-		vista.getBotonAñadir().addActionListener(this);
-		// Eliminar producto del carrito
-		vista.getBotonEliminar().addActionListener(this);
-
-		// Finalizar la compra
-		vista.getBotonFinalizar().addActionListener(this);
 
 		// Carga los productos al iniciar la vista del cajero
 		cargarProductos();
@@ -77,8 +72,11 @@ public class ControladorCajero implements ActionListener {
 			List<Producto> lista = daoProductos.listarProductos(); // Obtiene los productos desde la BBDD
 
 			// Añade a la tabla solo los productos que están en venta
-			lista.stream().filter(p -> p.isEnVenta())
-					.forEach(p -> modelo.addRow(new Object[] { p.getNombre(), p.getPrecio(), p.getUnidades() }));
+			lista.stream().filter(p -> p.isEnVenta()).forEach(p -> {
+				String[] arrayProducto = { p.getNombre(), String.valueOf(p.getPrecio()),
+						String.valueOf(p.getUnidades()) };
+				modelo.addRow(arrayProducto);
+			});
 
 		} catch (MiExcepcion e) {
 			Dialogos.avisoDialogo(Emergente.Error, "Error al cargar productos: " + e.getMessage());
@@ -144,8 +142,8 @@ public class ControladorCajero implements ActionListener {
 				Dialogos.avisoDialogo(Emergente.Error, "Este producto no tiene stock disponible.");
 				return;
 			}
-			modeloCarrito
-					.addRow(new Object[] { nombre,  (Math.round(precio * 100.0) / 100.0), 1, (Math.round(precio * 100.0) / 100.0) });
+			modeloCarrito.addRow(new Object[] { nombre, (Math.round(precio * 100.0) / 100.0), 1,
+					(Math.round(precio * 100.0) / 100.0) });
 		}
 
 		actualizarTotales(); // Recalcula totales tras añadir producto
@@ -164,23 +162,21 @@ public class ControladorCajero implements ActionListener {
 
 			// Cálculo de totales
 			double subtotalTotal = calcularTotal();
-			double impuesto = subtotalTotal * 0.21;
-			double totalConIVA = subtotalTotal + impuesto;
 
 			// Dinero introducido por el cliente
 			double dineroCliente = Double.parseDouble(vista.getCampoDineroCliente().getText().trim());
 
 			// Comprobación de si el dinero entregado cubre el total
-			if (dineroCliente < totalConIVA) {
+			if (dineroCliente < subtotalTotal) {
 				Dialogos.avisoDialogo(Emergente.Advertencia, "El dinero entregado no cubre el total.");
 				return;
 			}
 
-			double cambio = dineroCliente - totalConIVA;
+			double cambio = dineroCliente - subtotalTotal;
 			DefaultTableModel carrito = vista.getModeloCarrito();
 
 			// Crear factura principal
-			int idFactura = daoFacturas.crearFactura(idUsuario, subtotalTotal, impuesto, dineroCliente, cambio);
+			int idFactura = daoFacturas.crearFactura(idUsuario, subtotalTotal, subtotalTotal, dineroCliente, cambio);
 
 			// Registrar detalles de cada producto comprado y actualizar stock
 			for (int i = 0; i < carrito.getRowCount(); i++) {
@@ -215,20 +211,18 @@ public class ControladorCajero implements ActionListener {
 	}
 
 	/**
-	 * Calcula y actualiza el total e IVA en la interfaz.
+	 * Calcula y actualiza el total en la interfaz.
 	 */
 	private void actualizarTotales() {
 		double total = calcularTotal();
-		double impuesto = total * 0.21;
-		vista.getEtiquetaTotal().setText("Total: " + (Math.round(total + impuesto * 100.0) / 100.0) + " €");
-		vista.getEtiquetaImpuesto().setText("IVA (21%): " + (Math.round(impuesto * 100.0) / 100.0) + " €");
+		vista.getEtiquetaTotal().setText("Total: " + (Math.round(total * 100.0) / 100.0) + " €");
 		vista.getEtiquetaCambio().setText("Cambio: 0.00 €");
 	}
 
 	/**
 	 * Suma los subtotales de los productos del carrito.
 	 *
-	 * @return suma total sin IVA
+	 * @return suma total
 	 */
 	private double calcularTotal() {
 		DefaultTableModel modeloCarrito = vista.getModeloCarrito();

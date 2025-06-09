@@ -1,0 +1,110 @@
+package modelo;
+
+import java.util.Objects;
+
+import enumeraciones.TipoUsuario;
+import util.Contrasena;
+import util.MiExcepcion;
+
+/**
+ * Clase que representa a un usuario del sistema, con sus datos y tipo
+ * (Administrador o Cajero).
+ */
+public class Usuario {
+
+	// Atributos de la clase
+	private int id; // ID único del usuario (autogenerado o asignado)
+	private String nombre; // Nombre de usuario
+	private String password; // Contraseña cifrada
+	private TipoUsuario tipoUsuario; // Tipo de usuario (enum: Cajero o Administrador)
+
+	// ========================= CONSTRUCTORES =========================
+
+	/**
+	 * Constructor completo con ID (para usuarios ya existentes en la base de
+	 * datos). La contraseña se cifra al instanciar.
+	 */
+	public Usuario(int id, String nombre, String password, TipoUsuario tipoUsuario) throws MiExcepcion {
+		this.id = id;
+		this.nombre = nombre;
+		this.password = Contrasena.cifrar(password); // Se cifra al construir
+		this.tipoUsuario = tipoUsuario;
+	}
+
+	/**
+	 * Constructor sin ID (para nuevos registros). Cifra la contraseña al
+	 * instanciar.
+	 */
+	public Usuario(String nombre, String password, TipoUsuario tipoUsuario) throws MiExcepcion {
+		this.nombre = nombre;
+		this.password = Contrasena.cifrar(password); // Se cifra antes de guardar
+		this.tipoUsuario = tipoUsuario;
+	}
+
+	/**
+	 * Constructor por defecto para nuevos cajeros (tipo por defecto: Cajero).
+	 */
+	public Usuario(String nombre, String password) throws MiExcepcion {
+		this(nombre, password, TipoUsuario.Cajero); // Tipo por defecto
+	}
+
+	// ========================= MÉTODOS GETTER Y SETTER =========================
+
+	/**
+	 * Devuelve el ID del usuario.
+	 */
+	public int getId() {return id;}
+
+	public void setId(int id) {this.id = id;}
+
+	/**
+	 * Devuelve el nombre del usuario.
+	 */
+	public String getNombre() {return nombre;}
+
+	public void setNombre(String nombre) {this.nombre = nombre;}
+
+	/**
+	 * Devuelve la contraseña cifrada.
+	 */
+	public String getPassword() {return password;}
+
+	/**
+	 * Establece directamente la contraseña (debe venir ya cifrada si se usa este
+	 * método). No se cifra aquí para evitar cifrados dobles al recuperar de base de
+	 * datos.
+	 */
+	public void setPassword(String password) throws MiExcepcion {this.password = password;}
+
+	/**
+	 * Devuelve el tipo de usuario.
+	 */
+	public TipoUsuario getTipoUsuario() {return tipoUsuario;}
+
+	public void setTipoUsuario(TipoUsuario tipoUsuario) {this.tipoUsuario = tipoUsuario;}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, nombre, password, tipoUsuario);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Usuario other = (Usuario) obj;
+		return id == other.id && Objects.equals(nombre, other.nombre) && Objects.equals(password, other.password)
+				&& tipoUsuario == other.tipoUsuario;
+	}
+
+	@Override
+	public String toString() {
+		return "Usuario: " + nombre + "\nID: " + id + "\nNombre: " + nombre + "\nContraseña cifrada: " + password
+				+ "\nTipo de Usuario: " + tipoUsuario.getDescripcionUsuario();
+	}
+
+}

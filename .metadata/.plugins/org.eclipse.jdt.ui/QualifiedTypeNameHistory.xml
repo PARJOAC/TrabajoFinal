@@ -22,4 +22,9 @@
     <fullyQualifiedTypeName name="util.EstiloVista"/>
     <fullyQualifiedTypeName name="com.formdev.flatlaf.FlatDarculaLaf"/>
     <fullyQualifiedTypeName name="java.awt.FlowLayout"/>
+    <fullyQualifiedTypeName name="bd.InsertarDatosTablas"/>
+    <fullyQualifiedTypeName name="java.sql.ResultSet"/>
+    <fullyQualifiedTypeName name="bd.CrearTablas"/>
+    <fullyQualifiedTypeName name="util.InicioTablas"/>
+    <fullyQualifiedTypeName name="bd.DAOFacturas"/>
 </qualifiedTypeNameHistroy>

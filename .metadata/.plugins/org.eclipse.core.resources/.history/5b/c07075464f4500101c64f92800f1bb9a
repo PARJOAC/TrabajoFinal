@@ -1,0 +1,70 @@
+package vistaControlador;
+
+import java.io.Serializable;
+
+import controlador.ControladorAdministrador;
+import controlador.ControladorCajero;
+import controlador.ControladorProducto;
+import controlador.ControladorTema;
+import enumeraciones.Emergente;
+import modelo.Usuario;
+import util.Dialogos;
+import util.MiExcepcion;
+import vista.VistaAdministrador;
+import vista.VistaCajeros;
+
+/**
+ * Clase que lanza la vista correspondiente según el tipo de usuario que ha
+ * iniciado sesión. Se utiliza como punto de entrada tras un login exitoso.
+ */
+public class VistaSegunUsuario implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Constructor: identifica el tipo de usuario y lanza la vista adecuada.
+	 *
+	 * @param usuario Usuario autenticado
+	 * @throws MiExcepcion Si ocurre un error en la inicialización de controladores
+	 *                     o vistas
+	 */
+	public VistaSegunUsuario(Usuario usuario) throws MiExcepcion {
+		ControladorTema controladorTema = new ControladorTema();
+		switch (usuario.getTipoUsuario()) {
+		// Si el usuario es administrador, se carga la vista de administración completa
+		case Administrador -> {
+			VistaAdministrador vistaAdministrador = new VistaAdministrador();
+
+			// Se asignan los controladores asociados a la vista del administrador	
+			ControladorAdministrador controladorAdministrador = new ControladorAdministrador(vistaAdministrador);
+			
+			//Aádir los controladores a la vista
+			vistaAdministrador.controlAdministrador(controladorAdministrador);
+			vistaAdministrador.controlTeclas(controladorTema);
+			
+			vistaAdministrador.setVisible(true);
+			vistaAdministrador.pack();
+		}
+
+		// Si el usuario es cajero, se carga su vista limitada
+		case Cajero -> {
+			VistaCajeros vistaCajero = new VistaCajeros();
+
+			// Se le pasa su ID como responsable para futuras facturaciones
+			ControladorCajero controladorCajero = new ControladorCajero(vistaCajero, usuario.getId());
+			
+			vistaCajero.control(controladorCajero);
+			// Controlar que cuando se presione la tecla F12, se cambie el tema
+			vistaCajero.addKeyListener(controladorTema);
+			vistaCajero.setVisible(true);
+			vistaCajero.pack();
+		}
+
+		// Si el tipo de usuario no es reconocido
+		default -> {
+			Dialogos.avisoDialogo(Emergente.Error, "No se ha reconocido el tipo de usuario.");
+			System.exit(1); // Finaliza la aplicación
+		}
+		}
+	}
+}

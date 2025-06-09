@@ -3,6 +3,8 @@ package vista;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import controlador.ControladorCajero;
+import controlador.ControladorTema;
 import util.Logotipo;
 
 import java.awt.*;
@@ -30,7 +32,6 @@ public class VistaCajeros extends JFrame implements Serializable {
 	// Campos de texto y etiquetas para totales
 	private final JTextField campoDineroCliente;
 	private final JLabel etiquetaTotal;
-	private final JLabel etiquetaImpuesto;
 	private final JLabel etiquetaCambio;
 
 	// Botones de acción
@@ -50,7 +51,6 @@ public class VistaCajeros extends JFrame implements Serializable {
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(1500, 900));
-		setExtendedState(MAXIMIZED_BOTH); // Maximizado
 		setLocationRelativeTo(null); // Centrado
 
 		pestanas = new JTabbedPane();
@@ -92,13 +92,11 @@ public class VistaCajeros extends JFrame implements Serializable {
 
 		// Panel inferior (totales + efectivo)
 		etiquetaTotal = new JLabel("Total: 0.00 €");
-		etiquetaImpuesto = new JLabel("IVA (21%): 0.00 €");
 		etiquetaCambio = new JLabel("Cambio: 0.00 €");
 		campoDineroCliente = new JTextField();
 
 		JPanel panelInferior = new JPanel(new GridLayout(3, 2, 10, 10));
 		panelInferior.add(etiquetaTotal);
-		panelInferior.add(etiquetaImpuesto);
 		panelInferior.add(new JLabel("Efectivo entregado:"));
 		panelInferior.add(campoDineroCliente);
 		panelInferior.add(etiquetaCambio);
@@ -128,49 +126,29 @@ public class VistaCajeros extends JFrame implements Serializable {
 		setVisible(true);
 	}
 
-	// Getters públicos para el controlador
-	public JTable getTablaProductos() {
-		return tablaProductos;
+	// Getters
+	public JTable getTablaProductos() {return tablaProductos;}
+	public DefaultTableModel getModeloTabla() {return modeloTabla;}
+	public JTable getTablaCarrito() {return tablaCarrito;}
+	public DefaultTableModel getModeloCarrito() {return modeloCarrito;}
+	public JTextField getCampoDineroCliente() {return campoDineroCliente;}
+	public JLabel getEtiquetaTotal() {return etiquetaTotal;}
+	public JLabel getEtiquetaCambio() {return etiquetaCambio;}
+	public JButton getBotonAñadir() {return botonAñadir;}
+	public JButton getBotonEliminar() {return botonEliminar;}
+	public JButton getBotonFinalizar() {return botonFinalizar;}
+	
+	public void control(ControladorCajero ctr) {
+		botonAñadir.addActionListener(ctr);
+		botonEliminar.addActionListener(ctr);
+		botonFinalizar.addActionListener(ctr);
 	}
-
-	public DefaultTableModel getModeloTabla() {
-		return modeloTabla;
-	}
-
-	public JTable getTablaCarrito() {
-		return tablaCarrito;
-	}
-
-	public DefaultTableModel getModeloCarrito() {
-		return modeloCarrito;
-	}
-
-	public JTextField getCampoDineroCliente() {
-		return campoDineroCliente;
-	}
-
-	public JLabel getEtiquetaTotal() {
-		return etiquetaTotal;
-	}
-
-	public JLabel getEtiquetaImpuesto() {
-		return etiquetaImpuesto;
-	}
-
-	public JLabel getEtiquetaCambio() {
-		return etiquetaCambio;
-	}
-
-	public JButton getBotonAñadir() {
-		return botonAñadir;
-	}
-
-	public JButton getBotonEliminar() {
-		return botonEliminar;
-	}
-
-	public JButton getBotonFinalizar() {
-		return botonFinalizar;
+	
+	public void controlTeclas(ControladorTema ctr) {
+		//Teclas
+		// Controlar que cuando se presione la tecla F12, se cambie el tema
+		addKeyListener(ctr);
+		setFocusable(true);
 	}
 
 }

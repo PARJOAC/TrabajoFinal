@@ -19,7 +19,7 @@ public class Producto implements Serializable {
 	private static final long serialVersionUID = 585044535912349700L;
 
 	// Atributos de instancia del producto
-	private String nombre, descripcion;
+	private String nombre;
 	private double precio;
 	private String id; // Puede ser autogenerado por la BBDD o asignado
 	private Categoria categoria;
@@ -29,7 +29,6 @@ public class Producto implements Serializable {
 	private LocalDate fechaCaducidad;
 
 	// Valores por defecto
-	private static final String descripcionPorDefecto = "No se ha proporcionado una descripción.";
 	private static final Categoria categoriaPorDefecto = Categoria.SinCategoria;
 	private static final Marca marcaPorDefecto = Marca.SinMarca;
 	private static final boolean enVentaPorDefecto = true;
@@ -39,12 +38,10 @@ public class Producto implements Serializable {
 	/**
 	 * Constructor principal con todos los campos personalizables.
 	 */
-	public Producto(String nombreProducto, double precioProducto, String descripcionProducto,
-			Categoria categoriaProducto, Marca marcaProducto, int unidadesProducto, boolean enVenta,
-			String fechaCaducidad) throws MiExcepcion {
+	public Producto(String nombreProducto, double precioProducto, Categoria categoriaProducto, Marca marcaProducto,
+			int unidadesProducto, boolean enVenta, String fechaCaducidad) throws MiExcepcion {
 		this.nombre = nombreProducto;
 		this.precio = precioProducto;
-		this.descripcion = descripcionProducto;
 		this.categoria = categoriaProducto;
 		this.marca = marcaProducto;
 		this.unidades = unidadesProducto;
@@ -58,8 +55,8 @@ public class Producto implements Serializable {
 	 */
 	public Producto(String nombreProducto, double precioProducto, int unidadesProducto, String fechaCaducidad)
 			throws MiExcepcion {
-		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaPorDefecto, marcaPorDefecto,
-				unidadesProducto, enVentaPorDefecto, fechaCaducidad);
+		this(nombreProducto, precioProducto, categoriaPorDefecto, marcaPorDefecto, unidadesProducto, enVentaPorDefecto,
+				fechaCaducidad);
 	}
 
 	/**
@@ -67,8 +64,8 @@ public class Producto implements Serializable {
 	 */
 	public Producto(String nombreProducto, double precioProducto, Categoria categoriaProducto, int unidadesProducto,
 			String fechaCaducidad) throws MiExcepcion {
-		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaProducto, marcaPorDefecto,
-				unidadesProducto, enVentaPorDefecto, fechaCaducidad);
+		this(nombreProducto, precioProducto, categoriaProducto, marcaPorDefecto, unidadesProducto, enVentaPorDefecto,
+				fechaCaducidad);
 	}
 
 	/**
@@ -76,17 +73,8 @@ public class Producto implements Serializable {
 	 */
 	public Producto(String nombreProducto, double precioProducto, Marca marcaProducto, int unidadesProducto,
 			String fechaCaducidad) throws MiExcepcion {
-		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaPorDefecto, marcaProducto,
-				unidadesProducto, enVentaPorDefecto, fechaCaducidad);
-	}
-
-	/**
-	 * Constructor con obligatorios + descripción.
-	 */
-	public Producto(String nombreProducto, double precioProducto, String descripcionProducto, int unidadesProducto,
-			String fechaCaducidad) throws MiExcepcion {
-		this(nombreProducto, precioProducto, descripcionProducto, categoriaPorDefecto, marcaPorDefecto,
-				unidadesProducto, enVentaPorDefecto, fechaCaducidad);
+		this(nombreProducto, precioProducto, categoriaPorDefecto, marcaProducto, unidadesProducto, enVentaPorDefecto,
+				fechaCaducidad);
 	}
 
 	/**
@@ -94,8 +82,8 @@ public class Producto implements Serializable {
 	 */
 	public Producto(String nombreProducto, double precioProducto, Categoria categoriaProducto, Marca marcaProducto,
 			int unidadesProducto, String fechaCaducidad) throws MiExcepcion {
-		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaProducto, marcaProducto, unidadesProducto,
-				enVentaPorDefecto, fechaCaducidad);
+		this(nombreProducto, precioProducto, categoriaProducto, marcaProducto, unidadesProducto, enVentaPorDefecto,
+				fechaCaducidad);
 	}
 
 	/**
@@ -103,21 +91,11 @@ public class Producto implements Serializable {
 	 */
 	public Producto(String nombreProducto, double precioProducto, String descripcionProducto,
 			Categoria categoriaProducto, int unidadesProducto, String fechaCaducidad) throws MiExcepcion {
-		this(nombreProducto, precioProducto, descripcionProducto, categoriaProducto, marcaPorDefecto, unidadesProducto,
-				enVentaPorDefecto, fechaCaducidad);
+		this(nombreProducto, precioProducto, categoriaProducto, marcaPorDefecto, unidadesProducto, enVentaPorDefecto,
+				fechaCaducidad);
 	}
 
-	/**
-	 * Constructor con obligatorios + categoría + marca + enVenta.
-	 */
-	public Producto(String nombreProducto, double precioProducto, Categoria categoriaProducto, Marca marcaProducto,
-			int unidadesProducto, boolean enVenta, String fechaCaducidad) throws MiExcepcion {
-		this(nombreProducto, precioProducto, descripcionPorDefecto, categoriaProducto, marcaProducto, unidadesProducto,
-				enVenta, fechaCaducidad);
-	}
-
-	// ======================= GETTERS Y SETTERS =======================
-
+	// Métodos Getter y Setter
 	public String getNombre() {
 		return nombre;
 	}
@@ -126,21 +104,10 @@ public class Producto implements Serializable {
 		this.nombre = nombre;
 	}
 
-	public String getDescripcion() {
-		return descripcion;
-	}
-
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
-
 	public double getPrecio() {
 		return precio;
 	}
 
-	/**
-	 * Setter con validación de precio > 0.
-	 */
 	public void setPrecio(double precio) throws MiExcepcion {
 		if (precio <= 0)
 			throw new MiExcepcion("El precio debe ser mayor que 0.");
@@ -191,12 +158,6 @@ public class Producto implements Serializable {
 		return fechaCaducidad;
 	}
 
-	/**
-	 * Setter de la fecha con validación utilizando LibreriaFechas.
-	 *
-	 * @param fechaCaducidad Fecha en formato String (yyyy-MM-dd)
-	 * @throws MiExcepcion Si la fecha no es válida
-	 */
 	public void setFechaCaducidad(String fechaCaducidad) throws MiExcepcion {
 		if (LibreriaFechas.convierteStringToLocalDate(fechaCaducidad) == null)
 			throw new MiExcepcion("La fecha es incorrecta.");
@@ -205,7 +166,7 @@ public class Producto implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(categoria, descripcion, enVenta, fechaCaducidad, id, marca, nombre, precio, unidades);
+		return Objects.hash(categoria, enVenta, fechaCaducidad, id, marca, nombre, precio, unidades);
 	}
 
 	@Override
@@ -217,16 +178,16 @@ public class Producto implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Producto other = (Producto) obj;
-		return categoria == other.categoria && Objects.equals(descripcion, other.descripcion)
-				&& enVenta == other.enVenta && Objects.equals(fechaCaducidad, other.fechaCaducidad)
-				&& Objects.equals(id, other.id) && marca == other.marca && Objects.equals(nombre, other.nombre)
+		return categoria == other.categoria && enVenta == other.enVenta
+				&& Objects.equals(fechaCaducidad, other.fechaCaducidad) && Objects.equals(id, other.id)
+				&& marca == other.marca && Objects.equals(nombre, other.nombre)
 				&& Double.doubleToLongBits(precio) == Double.doubleToLongBits(other.precio)
 				&& unidades == other.unidades;
 	}
 
 	@Override
 	public String toString() {
-		return "Producto: " + nombre + "\nID: " + id + "\nDescripcion: " + descripcion + "\nPrecio: " + precio
+		return "Producto: " + nombre + "\nID: " + id + "\nPrecio: " + precio
 				+ "\nCategoria: " + categoria + "\nMarca: " + marca + "\nUnidades: " + unidades + "\n¿Está en venta?: "
 				+ (enVenta ? "Sí" : "No") + "\nCaducidad: " + LibreriaFechas.getFechaFull(fechaCaducidad);
 	}

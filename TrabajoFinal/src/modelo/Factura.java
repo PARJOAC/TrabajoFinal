@@ -6,7 +6,6 @@ public class Factura {
 	private int id;
 	private String usuario;
 	private double total;
-	private double iva;
 	private double efectivo;
 	private double cambio;
 	private String fecha;
@@ -14,77 +13,37 @@ public class Factura {
 	/**
 	 * Constructor para inicializar el resumen de factura con todos sus datos.
 	 */
-	public Factura(int id, String usuario, double total, double iva, double efectivo, double cambio,
+	public Factura(int id, String usuario, double total, double efectivo, double cambio,
 			String fecha) {
 		this.id = id;
 		this.usuario = usuario;
 		this.total = total;
-		this.iva = iva;
 		this.efectivo = efectivo;
 		this.cambio = cambio;
 		this.fecha = fecha;
 	}
 
-	public int getId() {
-		return id;
-	}
+	// Métodos Getter y Setter
+	public int getId() {return id;}
+	public void setId(int id) {this.id = id;}
 
-	public void setId(int id) {
-		this.id = id;
-	}
+	public String getUsuario() {return usuario;}
+	public void setUsuario(String usuario) {this.usuario = usuario;}
 
-	public String getUsuario() {
-		return usuario;
-	}
+	public double getTotal() {return total;}
+	public void setTotal(double total) {this.total = total;}
 
-	public void setUsuario(String usuario) {
-		this.usuario = usuario;
-	}
+	public double getEfectivo() {return efectivo;}
+	public void setEfectivo(double efectivo) {this.efectivo = efectivo;}
 
-	public double getTotal() {
-		return total;
-	}
+	public double getCambio() {return cambio;}
+	public void setCambio(double cambio) {this.cambio = cambio;}
 
-	public void setTotal(double total) {
-		this.total = total;
-	}
-
-	public double getIva() {
-		return iva;
-	}
-
-	public void setIva(double iva) {
-		this.iva = iva;
-	}
-
-	public double getEfectivo() {
-		return efectivo;
-	}
-
-	public void setEfectivo(double efectivo) {
-		this.efectivo = efectivo;
-	}
-
-	public double getCambio() {
-		return cambio;
-	}
-
-	public void setCambio(double cambio) {
-		this.cambio = cambio;
-	}
-
-	public String getFecha() {
-		return fecha;
-	}
-
-	public void setFecha(String fecha) {
-		this.fecha = fecha;
-	}
+	public String getFecha() {return fecha;}
+	public void setFecha(String fecha) {this.fecha = fecha;}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(cambio, efectivo, fecha, id, iva, total, usuario);
-	}
+	public int hashCode() {return Objects.hash(cambio, efectivo, fecha, id, total, usuario);}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -98,7 +57,6 @@ public class Factura {
 		return Double.doubleToLongBits(cambio) == Double.doubleToLongBits(other.cambio)
 				&& Double.doubleToLongBits(efectivo) == Double.doubleToLongBits(other.efectivo)
 				&& Objects.equals(fecha, other.fecha) && id == other.id
-				&& Double.doubleToLongBits(iva) == Double.doubleToLongBits(other.iva)
 				&& Double.doubleToLongBits(total) == Double.doubleToLongBits(other.total)
 				&& Objects.equals(usuario, other.usuario);
 	}
@@ -108,12 +66,9 @@ public class Factura {
 		return "Id: " + id +
 			   "\nUsuario que la realiza: " + usuario +
 			   "\nTotal: " + total +
-			   "\nIva=" + iva +
 			   "\nEfectivo: " + efectivo +
 			   "\nCambio: " + cambio +
 			   "\nFecha: " + fecha;
 	}
-	
-	
 
 }

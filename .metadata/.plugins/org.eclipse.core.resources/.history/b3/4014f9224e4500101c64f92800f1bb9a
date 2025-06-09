@@ -1,0 +1,57 @@
+package controlador;
+
+import bd.DAOUsuarios;
+import enumeraciones.Emergente;
+import enumeraciones.TipoUsuario;
+import modelo.Usuario;
+import util.Dialogos;
+import util.MiExcepcion;
+import vista.VistaAdministrador;
+
+import javax.swing.table.DefaultTableModel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+/**
+ * Controlador que gestiona la lógica relacionada con los usuarios en la vista
+ * del administrador. Permite crear, buscar y listar usuarios.
+ */
+public class ControladorUsuario implements ActionListener {
+
+	private final VistaAdministrador vista; // Vista que contiene los componentes de usuarios
+	private final DAOUsuarios daoUsuarios; // DAO para operaciones con la tabla de usuarios
+
+	/**
+	 * Constructor. Enlaza los botones con sus acciones y carga los usuarios.
+	 *
+	 * @param vista vista del administrador
+	 */
+	public ControladorUsuario(VistaAdministrador vista) {
+		this.vista = vista;
+		this.daoUsuarios = new DAOUsuarios();
+
+		// Asignar eventos a botones de la vista
+		this.vista.getBotonCrear().addActionListener(this);
+		this.vista.getBotonBuscar().addActionListener(this);
+
+		// Carga inicial de la tabla de usuarios
+		cargarUsuariosEnTabla();
+	}
+
+	/**
+	 * Manejo de eventos según el botón presionado.
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object fuente = e.getSource();
+
+		if (fuente == vista.getBotonCrear())
+			crearUsuario();
+		else if (fuente == vista.getBotonBuscar())
+			buscarUsuario();
+	}
+
+
+}

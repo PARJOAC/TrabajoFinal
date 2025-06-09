@@ -3,6 +3,10 @@ package vista;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import controlador.ControladorAdministrador;
+import controlador.ControladorTema;
+
 import java.awt.*;
 import java.io.Serializable;
 
@@ -35,8 +39,7 @@ public class VistaAdministrador extends JFrame implements Serializable {
 	// Componentes para la pestaña de productos
 	private JTable tablaProductos;
 	private DefaultTableModel modeloProductos;
-	private JTextField campoNombreProducto, campoPrecioProducto, campoUnidadesProducto, campoFechaProducto,
-			campoDescripcionProducto;
+	private JTextField campoNombreProducto, campoPrecioProducto, campoUnidadesProducto, campoFechaProducto;
 	private JComboBox<Categoria> comboCategoriaProducto;
 	private JComboBox<Marca> comboMarcaProducto;
 	private JCheckBox checkEnVenta;
@@ -59,7 +62,6 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		setTitle("Panel de Administración");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(new Dimension(1400, 900));
-		setExtendedState(MAXIMIZED_BOTH);
 		setLocationRelativeTo(null); // Centrado en pantalla
 
 		pestanas = new JTabbedPane();
@@ -100,7 +102,6 @@ public class VistaAdministrador extends JFrame implements Serializable {
 			System.out.println(e.getMessage());
 		}
 		getRootPane().setDefaultButton(botonCrear); // Enter = botón crear
-		setVisible(true);
 	}
 
 	/**
@@ -160,8 +161,7 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		JPanel panel = new JPanel(new BorderLayout());
 
 		// Columnas de la tabla
-		String[] columnas = { "ID", "Nombre", "Precio", "Unidades", "Fecha Cad.", "Categoría", "Marca", "En venta",
-				"Descripción" };
+		String[] columnas = { "ID", "Nombre", "Precio", "Unidades", "Fecha Cad.", "Categoría", "Marca", "En venta" };
 		modeloProductos = new DefaultTableModel() {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -179,7 +179,7 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		form.setBorder(BorderFactory.createTitledBorder("Gestión de Producto"));
 
 		// Etiquetas y campos
-		String[] etiquetas = { "Nombre:", "Precio:", "Unidades:", "Fecha Caducidad (DD/MM/YYYY):", "Descripción:" };
+		String[] etiquetas = { "Nombre:", "Precio:", "Unidades:", "Fecha Caducidad (DD/MM/YYYY):" };
 		JTextField[] campos = new JTextField[etiquetas.length];
 
 		for (int i = 0; i < etiquetas.length; i++) {
@@ -193,7 +193,6 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		campoPrecioProducto = campos[1];
 		campoUnidadesProducto = campos[2];
 		campoFechaProducto = campos[3];
-		campoDescripcionProducto = campos[4];
 
 		// Campos combo y checkbox
 		comboCategoriaProducto = new JComboBox<>(Categoria.values());
@@ -238,7 +237,7 @@ public class VistaAdministrador extends JFrame implements Serializable {
 	private JPanel construirPestanaFacturas() {
 		JPanel panel = new JPanel(new BorderLayout());
 
-		String[] columas = { "ID Factura", "Usuario", "Total", "IVA", "Efectivo", "Cambio", "Fecha" };
+		String[] columas = { "ID Factura", "Usuario", "Total", "Efectivo", "Cambio", "Fecha" };
 		modeloFacturas = new DefaultTableModel() {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -268,101 +267,55 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		}
 	}
 
-	// GETTERS
-	// Métodos públicos para acceder a los componentes desde los controladores
-
+	// Getters
 	// Usuarios
-	public JTextField getCampoUsuario() {
-		return campoUsuario;
-	}
-
-	public JPasswordField getCampoContrasena() {
-		return campoContrasena;
-	}
-
-	public JButton getBotonCrear() {
-		return botonCrear;
-	}
-
-	public JTable getTablaUsuarios() {
-		return tablaUsuarios;
-	}
-
-	public JTextField getCampoBuscar() {
-		return campoBuscar;
-	}
-
-	public DefaultTableModel getModeloTabla() {
-		return modeloTabla;
-	}
-
-	public JComboBox<TipoUsuario> getComboTipoUsuario() {
-		return comboTipoUsuario;
-	}
-
-	public JButton getBotonBuscar() {
-		return botonBuscar;
-	}
+	public JTextField getCampoUsuario() {return campoUsuario;}
+	public JPasswordField getCampoContrasena() {return campoContrasena;}
+	public JButton getBotonCrear() {return botonCrear;}
+	public JTable getTablaUsuarios() {return tablaUsuarios;}
+	public JTextField getCampoBuscar() {return campoBuscar;}
+	public DefaultTableModel getModeloTabla() {return modeloTabla;}
+	public JComboBox<TipoUsuario> getComboTipoUsuario() {return comboTipoUsuario;}
+	public JButton getBotonBuscar() {return botonBuscar;}
 
 	// Productos
-	public JTable getTablaProductos() {
-		return tablaProductos;
-	}
-
-	public DefaultTableModel getModeloProductos() {
-		return modeloProductos;
-	}
-
-	public JTextField getCampoNombreProducto() {
-		return campoNombreProducto;
-	}
-
-	public JTextField getCampoPrecioProducto() {
-		return campoPrecioProducto;
-	}
-
-	public JTextField getCampoUnidadesProducto() {
-		return campoUnidadesProducto;
-	}
-
-	public JTextField getCampoFechaProducto() {
-		return campoFechaProducto;
-	}
-
-	public JTextField getCampoDescripcionProducto() {
-		return campoDescripcionProducto;
-	}
-
-	public JComboBox<Categoria> getComboCategoriaProducto() {
-		return comboCategoriaProducto;
-	}
-
-	public JComboBox<Marca> getComboMarcaProducto() {
-		return comboMarcaProducto;
-	}
-
-	public JCheckBox getCheckEnVenta() {
-		return checkEnVenta;
-	}
-
-	public JButton getBotonAgregarProducto() {
-		return botonAgregarProducto;
-	}
-
-	public JButton getBotonModificarProducto() {
-		return botonModificarProducto;
-	}
-
-	public JButton getBotonEliminarProducto() {
-		return botonEliminarProducto;
-	}
+	public JTable getTablaProductos() {return tablaProductos;}
+	public DefaultTableModel getModeloProductos() {return modeloProductos;}
+	public JTextField getCampoNombreProducto() {return campoNombreProducto;}
+	public JTextField getCampoPrecioProducto() {return campoPrecioProducto;}
+	public JTextField getCampoUnidadesProducto() {return campoUnidadesProducto;}
+	public JTextField getCampoFechaProducto() {return campoFechaProducto;}
+	public JComboBox<Categoria> getComboCategoriaProducto() {return comboCategoriaProducto;}
+	public JComboBox<Marca> getComboMarcaProducto() {return comboMarcaProducto;}
+	public JCheckBox getCheckEnVenta() {return checkEnVenta;}
+	public JButton getBotonAgregarProducto() {return botonAgregarProducto;}
+	public JButton getBotonModificarProducto() {return botonModificarProducto;}
+	public JButton getBotonEliminarProducto() {return botonEliminarProducto;}
 
 	// Facturas
-	public JTable getTablaFacturas() {
-		return tablaFacturas;
+	public JTable getTablaFacturas() {return tablaFacturas;}
+	public DefaultTableModel getModeloFacturas() {return modeloFacturas;}
+	
+	public void controlAdministrador(ControladorAdministrador ctr) {
+		// Controlador de Administrador
+		botonCrear.addActionListener(ctr);
+		botonBuscar.addActionListener(ctr);
+		botonAgregarProducto.addActionListener(ctr);
+		botonModificarProducto.addActionListener(ctr);
+		botonEliminarProducto.addActionListener(ctr);
+		botonCrear.addActionListener(ctr);
+		botonBuscar.addActionListener(ctr);
+		botonAgregarProducto.addActionListener(ctr);
+		botonModificarProducto.addActionListener(ctr);
+		botonEliminarProducto.addActionListener(ctr);
+		tablaProductos.getSelectionModel().addListSelectionListener(ctr);
 	}
 
-	public DefaultTableModel getModeloFacturas() {
-		return modeloFacturas;
+	public void controlTeclas(ControladorTema ctr) {
+		//Teclas
+		// Controlar que cuando se presione la tecla F12, se cambie el tema
+		addKeyListener(ctr);
+		setFocusable(true);
 	}
+	
 }

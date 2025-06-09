@@ -1,0 +1,227 @@
+package bd;
+
+import enumeraciones.Categoria;
+import enumeraciones.Marca;
+import modelo.Producto;
+import util.MiExcepcion;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * DAO para manejar las operaciones de base de datos relacionadas con productos.
+ */
+public class DAOProductos {
+
+	/**
+	 * Inserta un nuevo producto en la base de datos.
+	 *
+	 * @param producto Objeto Producto a insertar
+	 * @throws MiExcepcion Si ocurre algún error al insertar
+	 */
+	public void crearProducto(Producto producto) throws MiExcepcion {
+		String sql = "INSERT INTO productos (nombre, descripcion, precio, categoria, marca, unidades, enVenta, fechaCaducidad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+		// Try-with-resources para asegurar cierre automático de recursos
+		try (Connection con = BDConnection.getConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
+
+			// Asignación de valores a la sentencia SQL
+			stmt.setString(1, producto.getNombre());
+			stmt.setString(2, producto.getDescripcion());
+			stmt.setDouble(3, producto.getPrecio());
+			stmt.setString(4, producto.getCategoria().name()); // Enum a string
+			stmt.setString(5, producto.getMarca().name()); // Enum a string
+			stmt.setInt(6, producto.getUnidades());
+			stmt.setBoolean(7, producto.isEnVenta());
+			stmt.setDate(8, Date.valueOf(producto.getFechaCaducidad()));
+
+			// Ejecución de la inserción
+			stmt.executeUpdate();
+
+		} catch (Exception e) {
+			// Se encapsula el error en una excepción personalizada
+			throw new MiExcepcion("Error al insertar producto: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Devuelve una lista con todos los productos almacenados en la base de datos.
+	 *
+	 * @return Lista de objetos Producto
+	 * @throws MiExcepcion Si ocurre algún error al listar
+	 */
+	public List<Producto> listarProductos() throws MiExcepcion {
+		List<Producto> lista = new ArrayList<>();
+		String sql = "SELECT * FROM productos";
+
+		try (Connection conn = BDConnection.getConnection();
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql)) {
+
+			// Recorremos los resultados y construimos los objetos Producto
+			while (rs.next()) {
+				try {
+					Producto productoNuevo = new Producto(rs.getString("nombre"), rs.getDouble("precio"),
+							rs.getString("descripcion"), Categoria.valueOf(rs.getString("categoria")),
+							Marca.valueOf(rs.getString("marca")), rs.getInt("unidades"), rs.getBoolean("enVenta"),
+							rs.getDate("fechaCaducidad").toString());
+					// Asignamos también su ID
+					productoNuevo.setId(String.valueOf(rs.getInt("idProducto")));
+					lista.add(productoNuevo);
+				} catch (IllegalArgumentException e) {
+					// Si falla al convertir enums, lo ignoramos y seguimos con los demás
+					System.err.println("Error al procesar un producto: " + e.getMessage());
+				}
+			}
+
+		} catch (Exception e) {
+			throw new MiExcepcion("Error al listar productos: " + e.getMessage());
+		}
+
+		return lista;
+	}
+
+	/**
+	 * Elimina un producto de la base de datos según su ID.
+	 *
+	 * @param id ID del producto a eliminar
+	 * @throws MiExcepcion Si ocurre algún error o no se encuentra el producto
+	 */
+	public void eliminarProducto(String id) throws MiExcepcion {
+		String sql = "DELETE FROM productos WHERE idProducto = ?";
+
+		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, Integer.parseInt(id));
+
+			// Si no se elimina ninguna fila, se lanza una excepción
+			if (stmt.executeUpdate() == 0) {
+				throw new MiExcepcion("No se encontró el producto con ID: " + id);
+			}
+
+		} catch (Exception e) {
+			throw new MiExcepcion("Error al eliminar producto: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Modifica los datos de un producto ya existente en la base de datos.
+	 *
+	 * @param producto Producto con los nuevos valores
+	 * @throws MiExcepcion Si ocurre un error o el producto no existe
+	 */
+	public void modificarProducto(Producto producto) throws MiExcepcion {
+		String sql = "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, categoria = ?, marca = ?, unidades = ?, enVenta = ?, fechaCaducidad = ? WHERE idProducto = ?";
+
+		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setString(1, producto.getNombre());
+			stmt.setString(2, producto.getDescripcion());
+			stmt.setDouble(3, producto.getPrecio());
+			stmt.setString(4, producto.getCategoria().name());
+			stmt.setString(5, producto.getMarca().name());
+			stmt.setInt(6, producto.getUnidades());
+			stmt.setBoolean(7, producto.isEnVenta());
+			stmt.setDate(8, Date.valueOf(producto.getFechaCaducidad()));
+			stmt.setInt(9, Integer.parseInt(producto.getId()));
+
+			// Si no se actualiza ninguna fila, significa que no existe ese producto
+			if (stmt.executeUpdate() == 0) {
+				throw new MiExcepcion("No se encontró el producto con ID: " + producto.getId());
+			}
+
+		} catch (Exception e) {
+			throw new MiExcepcion("Error al modificar producto: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Busca un producto en la base de datos a partir de su ID.
+	 *
+	 * @param id ID del producto
+	 * @return Producto encontrado
+	 * @throws MiExcepcion Si no se encuentra o hay un error
+	 */
+	public Producto buscarPorId(String id) throws MiExcepcion {
+		String sql = "SELECT * FROM productos WHERE idProducto = ?";
+
+		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, Integer.parseInt(id));
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					Producto p = new Producto(rs.getString("nombre"), rs.getDouble("precio"),
+							rs.getString("descripcion"), Categoria.valueOf(rs.getString("categoria")),
+							Marca.valueOf(rs.getString("marca")), rs.getInt("unidades"), rs.getBoolean("enVenta"),
+							rs.getDate("fechaCaducidad").toString());
+					p.setId(String.valueOf(rs.getInt("idProducto")));
+					return p;
+				} else {
+					throw new MiExcepcion("Producto no encontrado con ID: " + id);
+				}
+			}
+
+		} catch (Exception e) {
+			throw new MiExcepcion("Error al buscar producto: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Actualiza únicamente las unidades de un producto.
+	 *
+	 * @param id             ID del producto
+	 * @param nuevasUnidades Nueva cantidad
+	 * @throws MiExcepcion Si ocurre un error o no se encuentra el producto
+	 */
+	public void actualizarUnidades(String id, int nuevasUnidades) throws MiExcepcion {
+		String sql = "UPDATE productos SET unidades = ? WHERE idProducto = ?";
+
+		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setInt(1, nuevasUnidades);
+			stmt.setInt(2, Integer.parseInt(id));
+
+			if (stmt.executeUpdate() == 0) {
+				throw new MiExcepcion("No se pudo actualizar el stock del producto con ID: " + id);
+			}
+
+		} catch (Exception e) {
+			throw new MiExcepcion("Error al actualizar unidades del producto: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Busca un producto por su nombre exacto.
+	 *
+	 * @param nombre Nombre del producto
+	 * @return Producto encontrado
+	 * @throws MiExcepcion Si no se encuentra o hay error
+	 */
+	public Producto buscarPorNombre(String nombre) throws MiExcepcion {
+		String sql = "SELECT * FROM productos WHERE nombre = ?";
+
+		try (Connection conn = BDConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+			stmt.setString(1, nombre);
+
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					Producto p = new Producto(rs.getString("nombre"), rs.getDouble("precio"),
+							rs.getString("descripcion"), Categoria.valueOf(rs.getString("categoria")),
+							Marca.valueOf(rs.getString("marca")), rs.getInt("unidades"), rs.getBoolean("enVenta"),
+							rs.getDate("fechaCaducidad").toString());
+					p.setId(String.valueOf(rs.getInt("idProducto")));
+					return p;
+
+				} else {
+					throw new MiExcepcion("Producto no encontrado con nombre: " + nombre);
+				}
+			}
+
+		} catch (Exception e) {
+			throw new MiExcepcion("Error al buscar producto por nombre: " + e.getMessage());
+		}
+	}
+}

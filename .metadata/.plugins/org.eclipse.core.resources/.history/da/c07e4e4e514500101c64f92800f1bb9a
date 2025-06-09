@@ -1,0 +1,108 @@
+-- Dump simplificado y optimizado de la base de datos supermercado
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+START TRANSACTION;
+
+-- Creación de tablas
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `idUsuario` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreUsuario` varchar(50) NOT NULL,
+  `contrasena` varchar(200) NOT NULL,
+  `tipo` enum('Administrador','Cajero') NOT NULL DEFAULT 'Cajero',
+  PRIMARY KEY (`idUsuario`),
+  UNIQUE KEY `nombreUsuario` (`nombreUsuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE IF NOT EXISTS `productos` (
+  `idProducto` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` varchar(500) DEFAULT 'No se ha proporcionado una descripción.',
+  `precio` double NOT NULL,
+  `categoria` enum('SinCategoria','Limpieza','Alimentacion','Bebidas','Panaderia','Carniceria','Pescaderia','Congelados','Lacteos','FrutasVerduras','HigienePersonal','CuidadoBebe','Perfumeria','Mascotas','Drogueria','Papeleria','Electrodomesticos','Ropa','Ferreteria','Jugueteria','Tecnologia') DEFAULT 'SinCategoria',
+  `marca` enum('SinMarca','Nestle','CocaCola','Pepsi','Danone','Loreal','Nike','Adidas','Samsung','Apple','Sony','Unilever','Lego','Henkel','Oralb','Philips','Bosch','Zara','Ikea','Honda') DEFAULT 'SinMarca',
+  `unidades` int(11) NOT NULL DEFAULT 0,
+  `enVenta` tinyint(1) DEFAULT 1,
+  `fechaCaducidad` date DEFAULT NULL,
+  PRIMARY KEY (`idProducto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE IF NOT EXISTS `facturas` (
+  `idFactura` int(11) NOT NULL AUTO_INCREMENT,
+  `fecha` datetime DEFAULT CURRENT_TIMESTAMP,
+  `usuarioResponsable` int(11) NOT NULL,
+  `total` double NOT NULL,
+  `iva` double NOT NULL,
+  `efectivo` double NOT NULL,
+  `cambio` double NOT NULL,
+  PRIMARY KEY (`idFactura`),
+  KEY `usuarioResponsable` (`usuarioResponsable`),
+  CONSTRAINT `facturas_ibfk_1` FOREIGN KEY (`usuarioResponsable`) REFERENCES `usuarios` (`idUsuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+CREATE TABLE IF NOT EXISTS `factura_detalles` (
+  `idDetalle` int(11) NOT NULL AUTO_INCREMENT,
+  `idFactura` int(11) NOT NULL,
+  `idProducto` int(11) NOT NULL,
+  `nombreProducto` varchar(100) NOT NULL,
+  `precioUnitario` double NOT NULL,
+  `cantidad` int(11) NOT NULL,
+  `subtotal` double NOT NULL,
+  PRIMARY KEY (`idDetalle`),
+  KEY `idFactura` (`idFactura`),
+  KEY `idProducto` (`idProducto`),
+  CONSTRAINT `factura_detalles_ibfk_1` FOREIGN KEY (`idFactura`) REFERENCES `facturas` (`idFactura`) ON DELETE CASCADE,
+  CONSTRAINT `factura_detalles_ibfk_2` FOREIGN KEY (`idProducto`) REFERENCES `productos` (`idProducto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+
+-- Inserción de datos en tablas
+INSERT INTO `usuarios` (`idUsuario`, `nombreUsuario`, `contrasena`, `tipo`) VALUES
+(1, 'admin', '8Ob2XvduFmzvi/MCYZyTPw==', 'Administrador'),
+(2, 'usuario', 'gcbqo3tkOtsWaV7DGYVtsw==', 'Cajero'),
+(3, 'cajero1', 'aZqj9fQoYcaM9p8VyWf8Kg==', 'Cajero'),
+(4, 'ddd', 'wAkPL4/P/iLQzszoWxBWPA==', 'Administrador'),
+(5, 'cajero3', 'U360o9P4LTt0lZySls++kQ==', 'Cajero'),
+(6, 'test50', 'CmlgauQlOIz+rjJ65bnV3A==', 'Cajero');
+
+INSERT INTO `productos` (`idProducto`, `nombre`, `descripcion`, `precio`, `categoria`, `marca`, `unidades`, `enVenta`, `fechaCaducidad`) VALUES
+(1, 'Leche Entera', 'Esta es una descripción un poco larga', 0.95, 'Lacteos', 'SinMarca', 0, 1, '2025-12-31'),
+(2, 'Pan de molde', '', 1.25, 'Panaderia', 'SinMarca', 398, 1, '2025-11-15'),
+(3, 'Coca Cola lata', '', 0.8, 'Bebidas', 'CocaCola', 79, 1, '2026-01-01'),
+(4, 'Detergente líquido', '', 3.95, 'Limpieza', 'Unilever', 190, 1, '2026-06-01'),
+(5, 'Manzanas', '', 2.2, 'FrutasVerduras', 'SinMarca', 16, 1, '2025-06-30'),
+(7, 'Coca Cola lata', '', 0.81, 'Bebidas', 'CocaCola', 100, 1, '2026-01-01');
+
+INSERT INTO `facturas` (`idFactura`, `fecha`, `usuarioResponsable`, `total`, `iva`, `efectivo`, `cambio`) VALUES
+(1, '2025-06-01 21:22:35', 2, 18, 3.78, 25, 3.22),
+(2, '2025-06-01 21:25:42', 2, 3.8, 0.80, 5, 0.40),
+(3, '2025-06-01 21:45:27', 2, 33.25, 6.98, 42.2, 1.97),
+(4, '2025-06-01 21:45:45', 2, 2.85, 0.60, 4.5, 1.05),
+(5, '2025-06-01 21:45:58', 2, 0, 0, 49, 49),
+(6, '2025-06-01 21:47:52', 2, 0, 0, 12, 12),
+(7, '2025-06-01 21:48:16', 2, 0, 0, 12, 12),
+(8, '2025-06-01 21:48:34', 2, 0, 0, 1, 1),
+(9, '2025-06-01 21:49:05', 2, 0, 0, 1, 1),
+(10, '2025-06-01 21:51:21', 2, 0, 0, 1, 1),
+(11, '2025-06-01 21:55:33', 2, 6.9, 1.45, 10, 1.65),
+(12, '2025-06-02 00:19:03', 2, 4.1, 0.86, 5, 0.04),
+(13, '2025-06-02 00:36:04', 2, 6.25, 1.31, 10, 2.44),
+(14, '2025-06-02 01:35:18', 2, 114.8, 24.11, 140, 1.09),
+(15, '2025-06-02 10:06:26', 2, 4.4, 0.92, 10, 4.68),
+(16, '2025-06-05 16:14:57', 2, 76, 15.96, 92, 0.04),
+(17, '2025-06-06 11:14:07', 2, 2.5, 0.53, 4.97, 1.94);
+
+INSERT INTO `factura_detalles` (`idDetalle`, `idFactura`, `idProducto`, `nombreProducto`, `precioUnitario`, `cantidad`, `subtotal`) VALUES
+(1, 2, 1, 'Leche Entera', 0.95, 4, 3.8),
+(2, 3, 1, 'Leche Entera', 0.95, 35, 33.25),
+(3, 4, 1, 'Leche Entera', 0.95, 3, 2.85),
+(4, 11, 5, 'Manzanas', 2.2, 3, 6.6),
+(5, 11, 2, 'Pan de molde', 1.25, 1, 1.25),
+(6, 12, 2, 'Pan de molde', 1.25, 3, 3.75),
+(7, 13, 2, 'Pan de molde', 1.25, 5, 6.25),
+(8, 14, 1, 'Leche Entera', 0.95, 60, 57),
+(9, 14, 3, 'Coca Cola lata', 0.8, 40, 32),
+(10, 15, 3, 'Coca Cola lata', 0.8, 5, 4),
+(11, 16, 3, 'Coca Cola lata', 0.8, 95, 76),
+(12, 17, 4, 'Detergente líquido', 3.95, 1, 3.95);
+
+COMMIT;

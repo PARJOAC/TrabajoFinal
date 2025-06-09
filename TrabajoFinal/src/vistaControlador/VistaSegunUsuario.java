@@ -2,11 +2,9 @@ package vistaControlador;
 
 import java.io.Serializable;
 
+import controlador.ControladorAdministrador;
 import controlador.ControladorCajero;
-import controlador.ControladorFactura;
-import controlador.ControladorProducto;
 import controlador.ControladorTema;
-import controlador.ControladorUsuario;
 import enumeraciones.Emergente;
 import modelo.Usuario;
 import util.Dialogos;
@@ -30,20 +28,21 @@ public class VistaSegunUsuario implements Serializable {
 	 *                     o vistas
 	 */
 	public VistaSegunUsuario(Usuario usuario) throws MiExcepcion {
+		ControladorTema controladorTema = new ControladorTema();
 		switch (usuario.getTipoUsuario()) {
-
 		// Si el usuario es administrador, se carga la vista de administración completa
 		case Administrador -> {
 			VistaAdministrador vistaAdministrador = new VistaAdministrador();
 
-			// Se asignan los controladores asociados a la vista del administrador
-			new ControladorUsuario(vistaAdministrador); // Gestión de usuarios
-			new ControladorProducto(vistaAdministrador); // Gestión de productos
-			new ControladorFactura(vistaAdministrador); // Visualización de facturas
-
-			// Controlar que cuando se presione la tecla F12, se cambie el tema
-			vistaAdministrador.addKeyListener(new ControladorTema());
-			vistaAdministrador.setFocusable(true);
+			// Se asignan los controladores asociados a la vista del administrador	
+			ControladorAdministrador controladorAdministrador = new ControladorAdministrador(vistaAdministrador);
+			
+			//Aádir los controladores a la vista
+			vistaAdministrador.controlAdministrador(controladorAdministrador);
+			vistaAdministrador.controlTeclas(controladorTema);
+			
+			vistaAdministrador.setVisible(true);
+			vistaAdministrador.pack();
 		}
 
 		// Si el usuario es cajero, se carga su vista limitada
@@ -51,11 +50,10 @@ public class VistaSegunUsuario implements Serializable {
 			VistaCajeros vistaCajero = new VistaCajeros();
 
 			// Se le pasa su ID como responsable para futuras facturaciones
-			new ControladorCajero(vistaCajero, usuario.getId());
-
-			// Controlar que cuando se presione la tecla F12, se cambie el tema
-			vistaCajero.addKeyListener(new ControladorTema());
-			vistaCajero.setFocusable(true);
+			ControladorCajero controladorCajero = new ControladorCajero(vistaCajero, usuario.getId());
+			
+			vistaCajero.control(controladorCajero);
+			vistaCajero.controlTeclas(controladorTema);
 		}
 
 		// Si el tipo de usuario no es reconocido

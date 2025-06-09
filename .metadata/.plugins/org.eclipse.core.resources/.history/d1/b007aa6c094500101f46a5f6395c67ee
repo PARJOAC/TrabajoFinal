@@ -1,0 +1,44 @@
+package util;
+
+import java.awt.Window;
+
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+
+import enumeraciones.Temas;
+
+public class EstiloVista {
+
+	private static boolean modo = false;
+
+	public EstiloVista(Temas tema) {
+		modo = tema.equals(Temas.Claro) ? false : true;
+		cambiarTema();
+	}
+
+	public static void cambiarTema() {
+		try {
+			if (modo) {
+				UIManager.setLookAndFeel(new FlatDarkLaf());
+			}
+			else
+				UIManager.setLookAndFeel(new FlatLightLaf());
+			modo = !modo;
+/*
+			// Actualiza todas las ventanas activas
+			for (Window window : Window.getWindows()) {
+				SwingUtilities.updateComponentTreeUI(window);
+			}
+			*/
+
+		} catch (UnsupportedLookAndFeelException e) {
+			System.err.println("No se pudo aplicar el tema.");
+			e.printStackTrace();
+		}
+	}
+
+}

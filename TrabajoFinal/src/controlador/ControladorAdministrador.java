@@ -1,51 +1,53 @@
 package controlador;
 
+import bd.DAOFacturas;
 import bd.DAOProductos;
 import bd.DAOUsuarios;
 import enumeraciones.Categoria;
 import enumeraciones.Emergente;
 import enumeraciones.Marca;
 import enumeraciones.TipoUsuario;
+import modelo.Factura;
 import modelo.Producto;
 import modelo.Usuario;
 import util.Dialogos;
 import util.MiExcepcion;
 import vista.VistaAdministrador;
 
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
  * Controlador para la vista del administrador. Gestiona las acciones
  * relacionadas con usuarios y productos.
  */
-public class ControladorAdministrador implements ActionListener {
+public class ControladorAdministrador implements ActionListener, ListSelectionListener {
 
 	// Instancias necesarias para acceder a vista y DAOs
 	private final VistaAdministrador vista;
 	private final DAOProductos daoProductos;
 	private final DAOUsuarios daoUsuarios;
+	private final DAOFacturas daoFacturas;
 
 	/**
 	 * Constructor: vincula vista, DAOs y asigna listeners.
+	 * @throws MiExcepcion 
 	 */
-	public ControladorAdministrador(VistaAdministrador vista) {
+	public ControladorAdministrador(VistaAdministrador vista) throws MiExcepcion {
 		this.vista = vista;
 		this.daoProductos = new DAOProductos();
 		this.daoUsuarios = new DAOUsuarios();
-
-		// Asignación de botones a ActionListener
-		vista.getBotonCrear().addActionListener(this);
-		vista.getBotonBuscar().addActionListener(this);
-		vista.getBotonAgregarProducto().addActionListener(this);
-		vista.getBotonModificarProducto().addActionListener(this);
-		vista.getBotonEliminarProducto().addActionListener(this);
+		this.daoFacturas = new DAOFacturas();
 
 		// Carga inicial de datos
 		cargarUsuariosEnTabla();
 		cargarProductosEnTabla();
+		cargarFacturasEnTabla();
 	}
 
 	/**
@@ -67,45 +69,31 @@ public class ControladorAdministrador implements ActionListener {
 			eliminarProducto();
 	}
 
-	// ========================= MÉTODOS DE USUARIO =========================
 
 	/**
-	 * Crea un nuevo usuario usando los campos del formulario.
+	 * Obtiene el listado de facturas desde la base de datos y las muestra en la
+	 * tabla de la vista.
+	 *
+	 * @throws MiExcepcion si ocurre un error de negocio
 	 */
-	private void crearUsuario() {
-		String nombre = vista.getCampoUsuario().getText().trim();
-		String contrasena = new String(vista.getCampoContrasena().getPassword()).trim();
-		TipoUsuario tipo = (TipoUsuario) vista.getComboTipoUsuario().getSelectedItem();
-
-		if (nombre.isEmpty() || contrasena.isEmpty()) {
-			Dialogos.avisoDialogo(Emergente.Error, "Rellena todos los campos");
-			return;
-		}
-
+	public void cargarFacturasEnTabla() throws MiExcepcion {
 		try {
-			daoUsuarios.crearUsuario(new Usuario(nombre, contrasena, tipo));
-			cargarUsuariosEnTabla();
-			limpiarFormularioUsuarios();
-		} catch (MiExcepcion ex) {
-			Dialogos.avisoDialogo(Emergente.Error, "Fallo al crear usuario: " + ex.getMessage());
-		}
-	}
+			List<Factura> facturas = daoFacturas.listarFacturas();
+			DefaultTableModel modelo = vista.getModeloFacturas();
+			modelo.setRowCount(0);
 
-	/**
-	 * Filtra y muestra usuarios que coincidan con el texto del campo de búsqueda.
-	 */
-	private void buscarUsuario() {
-		String texto = vista.getCampoBuscar().getText().trim().toLowerCase();
-		try {
-			List<Usuario> lista = daoUsuarios.listarUsuarios();
-			DefaultTableModel modelo = vista.getModeloTabla();
-			modelo.setRowCount(0); // Limpia la tabla
-
-			lista.stream().filter(u -> u.getNombre().toLowerCase().contains(texto)).forEach(
-					u -> modelo.addRow(new Object[] { u.getNombre(), u.getTipoUsuario().getDescripcionUsuario() }));
-
-		} catch (MiExcepcion e) {
-			Dialogos.avisoDialogo(Emergente.Error, "Error al buscar usuario: " + e.getMessage());
+			for (Factura f : facturas) {
+				modelo.addRow(new Object[] {
+					f.getId(),
+					f.getUsuario(),
+					Math.round(f.getTotal() * 100.0) / 100.0,
+					Math.round(f.getEfectivo() * 100.0) / 100.0,
+					Math.round(f.getCambio() * 100.0) / 100.0,
+					f.getFecha()
+				});
+			}
+		} catch (SQLException | ClassNotFoundException e) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al cargar las facturas: " + e.getMessage());
 		}
 	}
 
@@ -118,8 +106,10 @@ public class ControladorAdministrador implements ActionListener {
 			DefaultTableModel modelo = vista.getModeloTabla();
 			modelo.setRowCount(0);
 
-			lista.stream().forEach(
-					u -> modelo.addRow(new Object[] { u.getNombre(), u.getTipoUsuario().getDescripcionUsuario() }));
+			lista.stream().forEach(u -> {
+				String[] arrayUsuario = { u.getNombre(), u.getTipoUsuario().getDescripcionUsuario() };
+				modelo.addRow(arrayUsuario);
+			});
 
 		} catch (MiExcepcion e) {
 			Dialogos.avisoDialogo(Emergente.Error, "Error al cargar usuarios: " + e.getMessage());
@@ -134,8 +124,6 @@ public class ControladorAdministrador implements ActionListener {
 		vista.getCampoContrasena().setText("");
 		vista.getComboTipoUsuario().setSelectedIndex(0);
 	}
-
-	// ========================= MÉTODOS DE PRODUCTO =========================
 
 	/**
 	 * Agrega un nuevo producto con los datos del formulario.
@@ -178,12 +166,12 @@ public class ControladorAdministrador implements ActionListener {
 	}
 
 	/**
-	 * Elimina el producto seleccionado de la tabla y la base de datos.
+	 * Elimina el producto seleccionado de la base de datos y actualiza la tabla.
 	 */
 	private void eliminarProducto() {
 		int fila = vista.getTablaProductos().getSelectedRow();
 		if (fila == -1) {
-			Dialogos.avisoDialogo(Emergente.Error, "Selecciona un producto");
+			Dialogos.avisoDialogo(Emergente.Error, "Selecciona un producto de la tabla para eliminar.");
 			return;
 		}
 
@@ -191,10 +179,10 @@ public class ControladorAdministrador implements ActionListener {
 
 		try {
 			daoProductos.eliminarProducto(id);
-			cargarProductosEnTabla();
-			limpiarFormularioProducto();
-		} catch (MiExcepcion e) {
-			Dialogos.avisoDialogo(Emergente.Error, "Error al eliminar producto: " + e.getMessage());
+			cargarTabla();
+			limpiarFormulario();
+		} catch (MiExcepcion ex) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al eliminar un producto: " + ex.getMessage());
 		}
 	}
 
@@ -207,10 +195,12 @@ public class ControladorAdministrador implements ActionListener {
 			modelo.setRowCount(0);
 			List<Producto> productos = daoProductos.listarProductos();
 
-			productos.stream()
-					.forEach(p -> modelo.addRow(new Object[] { p.getId(), p.getNombre(), p.getPrecio(), p.getUnidades(),
-							p.getFechaCaducidad(), p.getCategoria().getDescripcionCategoria(),
-							p.getMarca().getNombreMarca(), p.isEnVenta() ? "Disponible" : "No disponible" }));
+			productos.stream().forEach(p -> {
+				String[] arrayProducto = { p.getId(), p.getNombre(), String.valueOf(p.getPrecio()), String.valueOf(p.getUnidades()),
+					String.valueOf(p.getFechaCaducidad()).toString(), p.getCategoria().getDescripcionCategoria(),
+						p.getMarca().getNombreMarca(), p.isEnVenta() ? "Disponible" : "No disponible" };
+				modelo.addRow(arrayProducto);
+			});
 		} catch (MiExcepcion e) {
 			Dialogos.avisoDialogo(Emergente.Error, "Error al cargar productos: " + e.getMessage());
 		}
@@ -224,7 +214,6 @@ public class ControladorAdministrador implements ActionListener {
 		String precioStr = vista.getCampoPrecioProducto().getText().trim();
 		String unidadesStr = vista.getCampoUnidadesProducto().getText().trim();
 		String fecha = vista.getCampoFechaProducto().getText().trim();
-		String descripcion = vista.getCampoDescripcionProducto().getText().trim();
 		Categoria categoria = (Categoria) vista.getComboCategoriaProducto().getSelectedItem();
 		Marca marca = (Marca) vista.getComboMarcaProducto().getSelectedItem();
 		boolean enVenta = vista.getCheckEnVenta().isSelected();
@@ -233,7 +222,7 @@ public class ControladorAdministrador implements ActionListener {
 		double precio = Double.parseDouble(precioStr);
 		int unidades = Integer.parseInt(unidadesStr);
 
-		return new Producto(nombre, precio, descripcion, categoria, marca, unidades, enVenta, fecha);
+		return new Producto(nombre, precio, categoria, marca, unidades, enVenta, fecha);
 	}
 
 	/**
@@ -244,7 +233,135 @@ public class ControladorAdministrador implements ActionListener {
 		vista.getCampoPrecioProducto().setText("");
 		vista.getCampoUnidadesProducto().setText("");
 		vista.getCampoFechaProducto().setText("");
-		vista.getCampoDescripcionProducto().setText("");
+		vista.getComboCategoriaProducto().setSelectedIndex(0);
+		vista.getComboMarcaProducto().setSelectedIndex(0);
+		vista.getCheckEnVenta().setSelected(true);
+	}
+	
+	/**
+	 * APARTADO DE USUARIOS
+	 */
+	/**
+	 * Crea un nuevo usuario a partir de los campos del formulario. Muestra errores
+	 * si faltan datos o ocurre un problema al guardar.
+	 */
+	private void crearUsuario() {
+		// Obtener valores del formulario
+		String nombre = vista.getCampoUsuario().getText().trim();
+		String contrasena = new String(vista.getCampoContrasena().getPassword()).trim();
+		TipoUsuario tipoSeleccionado = (TipoUsuario) vista.getComboTipoUsuario().getSelectedItem();
+
+		// Validar campos obligatorios
+		if (nombre.isEmpty() || contrasena.isEmpty()) {
+			Dialogos.avisoDialogo(Emergente.Error, "Rellena todos los campos.");
+			return;
+		}
+
+		try {
+			// Crear y guardar nuevo usuario
+			daoUsuarios.crearUsuario(new Usuario(nombre, contrasena, tipoSeleccionado));
+			limpiarFormularioUsuarios(); // Limpiar los campos
+			cargarUsuariosEnTabla(); // Actualizar tabla
+		} catch (MiExcepcion ex) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al crear usuario: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Filtra la tabla de usuarios mostrando solo aquellos que coincidan con el
+	 * texto buscado.
+	 */
+	private void buscarUsuario() {
+		String texto = vista.getCampoBuscar().getText().trim().toLowerCase(); // Texto introducido por el usuario
+
+		try {
+			List<Usuario> lista = daoUsuarios.listarUsuarios(); // Obtener lista completa
+			DefaultTableModel modelo = vista.getModeloTabla();
+			modelo.setRowCount(0); // Limpiar tabla
+
+			// Añadir solo los que contienen el texto buscado
+			lista.stream().filter(u -> u.getNombre().toLowerCase().contains(texto)).forEach(u -> {
+				String[] arrayUsuario = { u.getNombre(), u.getTipoUsuario().getDescripcionUsuario() };
+				modelo.addRow(arrayUsuario);
+			});
+		} catch (MiExcepcion e) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al buscar el usuario: " + e.getMessage());
+		}
+	}
+	
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		int fila = vista.getTablaProductos().getSelectedRow();
+		if (fila == -1) return;
+
+		DefaultTableModel modelo = vista.getModeloProductos();
+
+		// Nombre
+		String nombre = modelo.getValueAt(fila, 1) != null ? (String) modelo.getValueAt(fila, 1) : "";
+		vista.getCampoNombreProducto().setText(nombre);
+
+		// Precio
+		String precio = modelo.getValueAt(fila, 2) != null ? modelo.getValueAt(fila, 2).toString() : "";
+		vista.getCampoPrecioProducto().setText(precio);
+
+		// Unidades
+		String unidades = modelo.getValueAt(fila, 3) != null ? modelo.getValueAt(fila, 3).toString() : "";
+		vista.getCampoUnidadesProducto().setText(unidades);
+
+		// Fecha
+		String fecha = modelo.getValueAt(fila, 4) != null ? modelo.getValueAt(fila, 4).toString() : "";
+		vista.getCampoFechaProducto().setText(fecha);
+
+		// Categoría
+		String categoria = modelo.getValueAt(fila, 5) != null ? modelo.getValueAt(fila, 5).toString() : "";
+		for (int i = 0; i < vista.getComboCategoriaProducto().getItemCount(); i++) {
+			boolean coincide = vista.getComboCategoriaProducto().getItemAt(i).getDescripcionCategoria().equals(categoria);
+			vista.getComboCategoriaProducto().setSelectedIndex(coincide ? i : vista.getComboCategoriaProducto().getSelectedIndex());
+		}
+
+		// Marca
+		String marca = modelo.getValueAt(fila, 6) != null ? modelo.getValueAt(fila, 6).toString() : "";
+		for (int i = 0; i < vista.getComboMarcaProducto().getItemCount(); i++) {
+			boolean coincide = vista.getComboMarcaProducto().getItemAt(i).getNombreMarca().equals(marca);
+			vista.getComboMarcaProducto().setSelectedIndex(coincide ? i : vista.getComboMarcaProducto().getSelectedIndex());
+		}
+
+		// En venta
+		String estado = modelo.getValueAt(fila, 7) != null ? modelo.getValueAt(fila, 7).toString() : "";
+		vista.getCheckEnVenta().setSelected(estado.equalsIgnoreCase("Disponible"));
+	}
+
+	/**
+	 * Carga todos los productos desde la base de datos y los muestra en la tabla.
+	 */
+	private void cargarTabla() {
+		try {
+			DefaultTableModel modelo = vista.getModeloProductos();
+			modelo.setRowCount(0); // Limpia la tabla antes de cargar datos
+			List<Producto> productos = daoProductos.listarProductos();
+
+			// Añade cada producto como una fila nueva
+			productos.stream().forEach(p -> {
+				String[] arrayProducto = { p.getId(), p.getNombre(), String.valueOf(p.getPrecio()),
+						String.valueOf(p.getUnidades()), String.valueOf(p.getFechaCaducidad()),
+						p.getCategoria().getDescripcionCategoria(), p.getMarca().getNombreMarca(),
+						p.isEnVenta() ? "Disponible" : "No disponible" };
+				modelo.addRow(arrayProducto);
+			});
+
+		} catch (MiExcepcion ex) {
+			Dialogos.avisoDialogo(Emergente.Error, "Error al cargar la tabla: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Limpia todos los campos del formulario de productos.
+	 */
+	private void limpiarFormulario() {
+		vista.getCampoNombreProducto().setText("");
+		vista.getCampoPrecioProducto().setText("");
+		vista.getCampoUnidadesProducto().setText("");
+		vista.getCampoFechaProducto().setText("");
 		vista.getComboCategoriaProducto().setSelectedIndex(0);
 		vista.getComboMarcaProducto().setSelectedIndex(0);
 		vista.getCheckEnVenta().setSelected(true);
