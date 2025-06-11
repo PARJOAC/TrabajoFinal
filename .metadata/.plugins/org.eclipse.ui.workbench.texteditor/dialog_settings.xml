@@ -4,21 +4,21 @@
 	<section name="java.lang.Class">
 		<item key="replaceBarOpen" value="false"/>
 		<list key="findhistory">
+			<item value="buscarPorNombre"/>
+			<item value="cargarTabla"/>
+			<item value="cargarPro"/>
+			<item value="String.valueOf"/>
+			<item value="detalle"/>
+			<item value="public"/>
+			<item value="format"/>
+			<item value="€"/>
+			<item value="eliminar"/>
+			<item value="Selecciona un producto"/>
+			<item value="setRowHeight"/>
 			<item value="error al fina"/>
 			<item value="error al modificar"/>
 			<item value="modificarProducto"/>
 			<item value="impuesto"/>
-			<item value="Descripción"/>
-			<item value="selecciona un prod"/>
-			<item value="descripcion"/>
-			<item value="Descripcion"/>
-			<item value="Descripci"/>
-			<item value=" new Producto"/>
-			<item value="cargar"/>
-			<item value="cre"/>
-			<item value="agregarProducto"/>
-			<item value="eliminarProducto"/>
-			<item value="Rellena todos"/>
 		</list>
 	</section>
 </section>

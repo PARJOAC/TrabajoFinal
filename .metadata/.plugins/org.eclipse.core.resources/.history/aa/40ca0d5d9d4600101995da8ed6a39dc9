@@ -28,17 +28,17 @@ public class ControladorLogin implements ActionListener {
 	 * ActionListener al botón de login.
 	 *
 	 * @param loginView VistaLogin que contiene los campos de usuario y contraseña
-	 * @throws MiExcepcion
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
+	 * @throws MiExcepcion 
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
 	 */
 	public ControladorLogin(VistaLogin vista) throws ClassNotFoundException, SQLException, MiExcepcion {
 		this.vista = vista;
 		this.dao = new DAOUsuarios();
-
+		
 		// Crear todas las tablas en caso de no existir
 		InicioTablas.iniciar();
-
+		
 	}
 
 	/**

@@ -21,7 +21,7 @@ public class DAOProductos {
 	 * @throws MiExcepcion Si ocurre algún error al insertar
 	 */
 	public void crearProducto(Producto producto) throws MiExcepcion {
-		String sql = "INSERT INTO productos (nombre, precio, categoria, marca, unidades, enVenta, fechaCaducidad) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO productos (nombre, precio, categoria, marca, unidades, enVenta, fechaCaducidad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 		// Try-with-resources para asegurar cierre automático de recursos
 		try (Connection con = BDConnection.getConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {

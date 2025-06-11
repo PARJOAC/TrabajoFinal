@@ -9,7 +9,10 @@ public class ControladorTema implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-
+		if (e.getKeyCode() == KeyEvent.VK_F12) {
+			System.out.println("F12");
+			EstiloVista.cambiarTema();
+		}
 	}
 
 	@Override
@@ -19,7 +22,7 @@ public class ControladorTema implements KeyListener {
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		System.out.println("El tema ha cambiado");
+		System.out.println("F12");
 		if (e.getKeyCode() == KeyEvent.VK_F12) {
 
 			EstiloVista.cambiarTema();

@@ -27,4 +27,5 @@
     <fullyQualifiedTypeName name="bd.CrearTablas"/>
     <fullyQualifiedTypeName name="util.InicioTablas"/>
     <fullyQualifiedTypeName name="bd.DAOFacturas"/>
+    <fullyQualifiedTypeName name="util.LibreriaFechas"/>
 </qualifiedTypeNameHistroy>

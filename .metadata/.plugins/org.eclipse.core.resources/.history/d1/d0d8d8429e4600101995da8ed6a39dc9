@@ -52,9 +52,6 @@ public class VistaSegunUsuario implements Serializable {
 			ControladorCajero controladorCajero = new ControladorCajero(vistaCajero, usuario.getId());
 			
 			vistaCajero.control(controladorCajero, controladorTema);
-			
-			vistaCajero.setVisible(true);
-			vistaCajero.pack();
 		}
 
 		// Si el tipo de usuario no es reconocido

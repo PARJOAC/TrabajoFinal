@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS `productos` (
   `categoria` enum('SinCategoria','Limpieza','Alimentacion','Bebidas','Panaderia','Carniceria','Pescaderia','Congelados','Lacteos','FrutasVerduras','HigienePersonal','CuidadoBebe','Perfumeria','Mascotas','Drogueria','Papeleria','Electrodomesticos','Ropa','Ferreteria','Jugueteria','Tecnologia') DEFAULT 'SinCategoria',
   `marca` enum('SinMarca','Nestle','CocaCola','Pepsi','Danone','Loreal','Nike','Adidas','Samsung','Apple','Sony','Unilever','Lego','Henkel','Oralb','Philips','Bosch','Zara','Ikea','Honda') DEFAULT 'SinMarca',
   `unidades` int(11) NOT NULL DEFAULT 0,
-  `enVenta` tinyint(1) NOT NULL DEFAULT 1,
-  `fechaCaducidad` date NOT NULL,
+  `enVenta` tinyint(1) DEFAULT 1,
+  `fechaCaducidad` date DEFAULT NULL,
   PRIMARY KEY (`idProducto`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
 
