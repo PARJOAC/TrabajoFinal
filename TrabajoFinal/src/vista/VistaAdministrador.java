@@ -90,7 +90,6 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		modeloTabla.addColumn("Tipo de Usuario");
 
 		tablaUsuarios = new JTable(modeloTabla);
-		tablaUsuarios.setRowHeight(25);
 		centrarColumnas(tablaUsuarios);
 
 		// Método que construye las tres pestañas principales y las añade al contenedor
@@ -298,11 +297,6 @@ public class VistaAdministrador extends JFrame implements Serializable {
 	
 	public void controlAdministrador(ControladorAdministrador ctr, ControladorTema ctrTema) {
 		// Controlador de Administrador
-		botonCrear.addActionListener(ctr);
-		botonBuscar.addActionListener(ctr);
-		botonAgregarProducto.addActionListener(ctr);
-		botonModificarProducto.addActionListener(ctr);
-		botonEliminarProducto.addActionListener(ctr);
 		botonCrear.addActionListener(ctr);
 		botonBuscar.addActionListener(ctr);
 		botonAgregarProducto.addActionListener(ctr);

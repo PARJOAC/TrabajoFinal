@@ -1,0 +1,16 @@
+package bd;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import util.MiExcepcion;
+
+/**
+ * Clase DAO que se encarga de gestionar la inserción de facturas y sus
+ * detalles, así como la consulta de los productos asociados a una factura
+ * específica.
+ */
+public class DAOCajeros {
+
+}

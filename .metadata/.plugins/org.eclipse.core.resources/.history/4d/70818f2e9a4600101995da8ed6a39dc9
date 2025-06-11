@@ -1,0 +1,66 @@
+package bd;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import util.MiExcepcion;
+
+/**
+ * Clase DAO que se encarga de gestionar la inserción de facturas y sus
+ * detalles, así como la consulta de los productos asociados a una factura
+ * específica.
+ */
+public class DAOCajeros {
+
+	/**
+	 * Obtiene una lista de los productos comprados en una factura concreta,
+	 * formateados como texto.
+	 *
+	 * @param idFactura ID de la factura de la cual se quiere consultar el detalle
+	 * @return Lista de cadenas de texto que describen cada producto (nombre,
+	 *         precio, cantidad, subtotal)
+	 */
+	private List<String> listarDetallesFactura(int idFactura) throws SQLException, ClassNotFoundException, MiExcepcion {
+
+		// Lista donde se almacenará el resultado final
+		List<String> lista = new ArrayList<>();
+
+		// Sentencia SQL para obtener los detalles de la factura específica
+		String sql = "SELECT nombreProducto, precioUnitario, cantidad, subtotal FROM detalles_factura WHERE idFactura = ?";
+
+		// Se establece la conexión y se prepara la sentencia
+		try (Connection con = BDConnection.getConnection(); PreparedStatement stmt = con.prepareStatement(sql)) {
+
+			// Se asigna el ID de la factura al parámetro de la consulta
+			stmt.setInt(1, idFactura);
+
+			// Se ejecuta la consulta
+			try (ResultSet rs = stmt.executeQuery()) {
+				while (rs.next()) {
+					// Se obtienen los datos de cada producto
+					String nombre = rs.getString("nombreProducto");
+					double precio = rs.getDouble("precioUnitario");
+					int cantidad = rs.getInt("cantidad");
+					double subtotal = rs.getDouble("subtotal");
+
+					// Se redondean los valores a 2 decimales para evitar errores visuales o
+					// inconsistencias
+					precio = Math.round(precio * 100.0) / 100.0;
+					subtotal = Math.round(subtotal * 100.0) / 100.0;
+
+					// Se genera una línea de texto con el formato deseado
+					String detalle = nombre + " - " + precio + " x" + cantidad + " = " + subtotal;
+
+					// Se añade el detalle a la lista
+					lista.add(detalle);
+				}
+			}
+		} catch (MiExcepcion e) {
+			throw new MiExcepcion("Ha ocurrido un error al buscar la factura.");
+		}
+
+		// Se devuelve la lista completa de descripciones de productos
+		return lista;
+	}
+}
