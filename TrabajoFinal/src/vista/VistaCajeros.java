@@ -50,6 +50,9 @@ public class VistaCajeros extends JFrame implements Serializable {
 		add(pestanas);
 	}
 
+	/**
+	 * Establecer el icono de la ventana
+	 */
 	private void setIconoVentana() {
 		Image imagen = Logotipo.logotipoCabecera(this);
 		if (imagen != null) {

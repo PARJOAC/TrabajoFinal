@@ -1,7 +1,6 @@
 package vista;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import controlador.ControladorAdministrador;
@@ -55,9 +54,7 @@ public class VistaAdministrador extends JFrame implements Serializable {
 	@SuppressWarnings("serial")
 	public VistaAdministrador() {
 		// Añadir el logo a la cabecera de la pestaña
-		Image imagen = Logotipo.logotipoCabecera(this);
-		if (imagen != null)
-			setIconImage(imagen);
+		setIconoVentana();
 
 		setTitle("Panel de Administración");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -90,7 +87,6 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		modeloTabla.addColumn("Tipo de Usuario");
 
 		tablaUsuarios = new JTable(modeloTabla);
-		centrarColumnas(tablaUsuarios);
 
 		// Método que construye las tres pestañas principales y las añade al contenedor
 		// principal
@@ -104,10 +100,20 @@ public class VistaAdministrador extends JFrame implements Serializable {
 	}
 
 	/**
+	 * Establecer el icono de la ventana
+	 */
+	private void setIconoVentana() {
+		Image imagen = Logotipo.logotipoCabecera(this);
+		if (imagen != null) {
+			setIconImage(imagen);
+		}
+	}
+
+	/**
 	 * Método que construye y añade las pestañas principales al JTabbedPane.
 	 */
 	private void crearPestanasAdministrador() {
-		campoBuscar = new JTextField(20);
+		campoBuscar = new JTextField();
 		pestanas.add("Almacén", construirPestanaProductos());
 		pestanas.add("Facturas", construirPestanaFacturas());
 		pestanas.add("Usuarios", construirPestanaUsuarios());
@@ -135,14 +141,13 @@ public class VistaAdministrador extends JFrame implements Serializable {
 	 */
 	private JPanel construirFormulario() {
 		JPanel panel = new JPanel(new FlowLayout());
-		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		panel.add(new JLabel("Usuario:"));
-		panel.add(campoUsuario);
-		panel.add(new JLabel("Contraseña:"));
-		panel.add(campoContrasena);
-		panel.add(new JLabel("Tipo de usuario:"));
-		panel.add(comboTipoUsuario);
+		String[] label = { "Usuario:", "Contraseña:", "Tipo de usuario:" };
+		Component[] campos = { campoUsuario, campoContrasena, comboTipoUsuario };
+		for(int i = 0; i < label.length; i++) {
+			panel.add(new JLabel(label[i]));
+			panel.add(campos[i]);
+		}
 
 		JPanel panelBoton = new JPanel(new FlowLayout());
 		panelBoton.add(botonCrear);
@@ -170,7 +175,6 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		modeloProductos.setColumnIdentifiers(columnas);
 
 		tablaProductos = new JTable(modeloProductos);
-		centrarColumnas(tablaProductos);
 		panel.add(new JScrollPane(tablaProductos), BorderLayout.CENTER);
 
 		// Formulario de producto
@@ -180,45 +184,36 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		// Etiquetas y campos
 		String[] etiquetas = { "Nombre:", "Precio:", "Unidades:", "Fecha Caducidad (DD/MM/YYYY):" };
 		JTextField[] campos = new JTextField[etiquetas.length];
+		Component[] componentes = {campoNombreProducto, campoPrecioProducto, campoUnidadesProducto, campoFechaProducto};
 
 		for (int i = 0; i < etiquetas.length; i++) {
 			form.add(new JLabel(etiquetas[i]));
 			campos[i] = new JTextField();
 			form.add(campos[i]);
+			componentes[i] = campos[i];
 		}
-
-		// Asignar a atributos
-		campoNombreProducto = campos[0];
-		campoPrecioProducto = campos[1];
-		campoUnidadesProducto = campos[2];
-		campoFechaProducto = campos[3];
 
 		// Campos combo y checkbox
 		comboCategoriaProducto = new JComboBox<>(Categoria.values());
 		comboMarcaProducto = new JComboBox<>(Marca.values());
-		checkEnVenta = new JCheckBox("En venta", true);
+		checkEnVenta = new JCheckBox("", true);
 
 		form.add(new JLabel("Categoría:"));
 		form.add(comboCategoriaProducto);
 		form.add(new JLabel("Marca:"));
 		form.add(comboMarcaProducto);
-		form.add(new JLabel(""));
+		form.add(new JLabel("¿Se vende?"));
 		form.add(checkEnVenta);
 
 		// Botones
-		String[] textosBotones = { "Añadir producto", "Modificar producto", "Eliminar producto" };
-		JButton[] botones = new JButton[textosBotones.length];
+		botonAgregarProducto = new JButton("Añadir producto");
+		botonModificarProducto = new JButton("Modificar producto");
+		botonEliminarProducto = new JButton("Eliminar producto");
 
 		JPanel panelBotones = new JPanel(new FlowLayout());
-		for (int i = 0; i < textosBotones.length; i++) {
-			botones[i] = new JButton(textosBotones[i]);
-			panelBotones.add(botones[i]);
-		}
-
-		// Asignar a atributos
-		botonAgregarProducto = botones[0];
-		botonModificarProducto = botones[1];
-		botonEliminarProducto = botones[2];
+		panelBotones.add(botonAgregarProducto);
+		panelBotones.add(botonModificarProducto);
+		panelBotones.add(botonEliminarProducto);
 
 		// Componer zona inferior
 		JPanel zonaInferior = new JPanel(new BorderLayout());
@@ -246,24 +241,11 @@ public class VistaAdministrador extends JFrame implements Serializable {
 		modeloFacturas.setColumnIdentifiers(columas);
 
 		tablaFacturas = new JTable(modeloFacturas);
-		centrarColumnas(tablaFacturas);
 
 		JScrollPane scroll = new JScrollPane(tablaFacturas);
-		scroll.setBorder(BorderFactory.createTitledBorder("Historial de facturas"));
-
+		
 		panel.add(scroll, BorderLayout.CENTER);
 		return panel;
-	}
-
-	/**
-	 * Aplica alineación centrada a todas las columnas de una tabla dada.
-	 */
-	private void centrarColumnas(JTable tabla) {
-		DefaultTableCellRenderer centro = new DefaultTableCellRenderer();
-		centro.setHorizontalAlignment(SwingConstants.CENTER);
-		for (int i = 0; i < tabla.getColumnCount(); i++) {
-			tabla.getColumnModel().getColumn(i).setCellRenderer(centro);
-		}
 	}
 
 	// Getters

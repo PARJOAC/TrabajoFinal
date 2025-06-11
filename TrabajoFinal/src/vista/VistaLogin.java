@@ -22,7 +22,7 @@ public class VistaLogin extends JFrame implements Serializable {
 	private JTextField campoUsuario; // Campo para introducir el nombre de usuario
 	private JPasswordField campoContrasena; // Campo para introducir la contraseña
 	private JButton botonLogin; // Botón para iniciar sesión
-
+	private JLabel etiquetaImagen;
 	/**
 	 * Constructor: configura e inicializa la interfaz del login.
 	 */
@@ -55,14 +55,8 @@ public class VistaLogin extends JFrame implements Serializable {
 		panelCampos.add(campoContrasena);
 
 		// Imagen inicial
-		JLabel etiquetaImagen = new JLabel();
-		Image imagen = Logotipo.logotipoMediano(this);
-		if(imagen != null) {
-			etiquetaImagen.setIcon(new ImageIcon(imagen));
-			
-			//Añadir el logo a la cabecera de la pestaña
-			setIconImage(imagen);
-		}
+		etiquetaImagen = new JLabel();
+		setImagenLogin();
 
 		JPanel panelImagen = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		panelImagen.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 20));
@@ -85,6 +79,18 @@ public class VistaLogin extends JFrame implements Serializable {
 
 		// Configuración final
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	}
+
+	/**
+	 * Establecer el icono de la ventana y la imagen
+	 */
+	private void setImagenLogin() {
+		Image imagen = Logotipo.logotipoMediano(this);
+		if(imagen != null) {
+			etiquetaImagen.setIcon(new ImageIcon(imagen));
+			//Añadir el logo a la cabecera de la pestaña
+			setIconImage(imagen);
+		}
 	}
 
 	// Getters
